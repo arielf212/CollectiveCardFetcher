@@ -1,5 +1,6 @@
 import praw , discord
 import os # I need this to use environment variables on heroku
+import csv # this is to browse the core set
 from discord.ext import commands
 
 # reddit variables
@@ -37,7 +38,19 @@ async def on_message(message):
                 for post in collective.top(limit = int(num) , time_filter='week'):
                     links.append(post.url)
         else:
+            found = False
             for post in collective.search('[card] {}'.format(card) , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
+                found = True
                 links.append(post.url)
+            if not found: # if we didnt find any cards that go by that name
+                with open('core_set.csv' , 'r') as core_set_file: # the we check in the core_set
+                    core_set = csv.reader(core_set_file , delimeter = ',') # this opens the csv file
+                    for core_card in core_set: # this runs trough all the rows
+                        name , link = card
+                        if name.lower() == card.lower():
+                            links.append(link)
+                            found = True
+                        if found:
+                            break # no need to continue searching
     await bot.send_message(message.channel , '\n'.join(links))
 bot.run(os.environ.get('BOT_TOKEN'))
