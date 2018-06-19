@@ -37,4 +37,4 @@ async def on_message(message):
             for post in collective.search('[card] {}'.format(card) , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                 links.append(post.url)
     await bot.send_message(message.channel , '\n'.join(links))
-bot.run(os.environ('BOT_TOKEN'))
+bot.run(os.environ.get('BOT_TOKEN'))
