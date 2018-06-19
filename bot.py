@@ -44,9 +44,9 @@ async def on_message(message):
                 links.append(post.url)
             if not found: # if we didnt find any cards that go by that name
                 with open('core_set.csv' , 'r') as core_set_file: # the we check in the core_set
-                    core_set = csv.reader(core_set_file , delimeter = ',') # this opens the csv file
+                    core_set = csv.reader(core_set_file , delimiter = ',') # this opens the csv file
                     for core_card in core_set: # this runs trough all the rows
-                        name , link = card
+                        name , link = core_card
                         if name.lower() == card.lower():
                             links.append(link)
                             found = True
