@@ -36,6 +36,8 @@ async def on_message(message):
         parameters = message.content.split(' ') # all commands look like this : '!command par1 par2 par3...'
         if parameters[0] == '!save':
             save_card(parameters[1] , parameters[2]) # saved the card data (name , link) into the csv with temp cards.
+            await bot.send_message(message.channel , '{} was added!'.format(parameters[1])) # sends confirmation message
+            return 0 # quits the function
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
@@ -56,12 +58,15 @@ async def on_message(message):
                         with open('temp_cards.csv' , 'r') as temp_cards_file:
                             core_set = csv.reader(core_set_file , delimiter = ',') # this opens the csv file
                             temp_cards = csv.reader(temp_cards_file , delimiter = ',')
-                            for core_card in core_set + temp_cards: # this runs trough all the rows
-                                name , link = core_card
-                                if name.lower() == card.lower():
-                                    links.append(link)
-                                    found = True
+                            for csv_file in [core_set , temp_cards]: # runs trough both files
+                                for core_card in csv_file: # this runs trough all the rows
+                                    name , link = core_card
+                                    if name.lower() == card.lower():
+                                        links.append(link)
+                                        found = True
+                                    if found:
+                                        break # no need to continue searching
                                 if found:
-                                    break # no need to continue searching
+                                    break
         await bot.send_message(message.channel , '\n'.join(links))
 bot.run(os.environ.get('BOT_TOKEN'))
