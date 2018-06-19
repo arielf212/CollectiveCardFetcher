@@ -3,7 +3,7 @@ import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
 from discord.ext import commands
 
-# reddit variables
+# Reddit variables
 reddit = praw.Reddit(client_id = 'x4FICJQqO4D14g' , client_secret = 'i9kip94Qs6R4Kfy77XYzDuv0z8Q' , user_agent = 'Card fetcher for collective.') # gives access to reddit
 collective = reddit.subreddit('collectivecg') # gives access to the Collective subreddit
 
