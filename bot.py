@@ -30,9 +30,12 @@ async def on_message(message):
     cards = get_card_name(message.content) # this gets all card names in the message
     links = [] # here are the card links stored
     for card in cards:
-        if card == 'top 10' or card == 'top ten':
-            for post in collective.top(limit = 10 , time_filter='week'):
-                links.append(post.url)
+        if card.startswith('top ') and len(card.split(' ')) == 2: # the name looks like this :"top X"
+            num = card.split(' ')[1]
+            if num.isdigit():
+                num = int(num)
+                for post in collective.top(limit = int(num) , time_filter='week'):
+                    links.append(post.url)
         else:
             for post in collective.search('[card] {}'.format(card) , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                 links.append(post.url)
