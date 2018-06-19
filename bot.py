@@ -68,5 +68,6 @@ async def on_message(message):
                                         break # no need to continue searching
                                 if found:
                                     break
-        await bot.send_message(message.channel , '\n'.join(links))
+        for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
+            await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
 bot.run(os.environ.get('BOT_TOKEN'))
