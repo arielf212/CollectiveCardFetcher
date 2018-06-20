@@ -35,14 +35,14 @@ def save_card(name , link):
 def load_core_set(core_set):
     '''loads the core set cards from core_set.csv into a dictionary called core_set'''
     with open('core_set.csv' , 'r') as core_set_file:
-        core_set_csv = csv.reader(core_set_file , delimeter = ',')
+        core_set_csv = csv.reader(core_set_file , delimiter = ',')
         for row in core_set_csv:
             name , link = row # unpack the row into a name and a link
             core_set[name] = link # adds the card into the core_set dictionary
 def load_temp_cards(temp_cards):
     '''loads the temp saved cards from temp_cards.csv into a dictionary called temp_cards'''
     with open('core_set.csv' , 'r') as temp_cards_file:
-        temp_cards_csv = csv.reader(temp_cards_file , delimeter = ',')
+        temp_cards_csv = csv.reader(temp_cards_file , delimiter = ',')
         for row in temp_cards_csv:
             name , link = row # unpack the row into a name and a link
             temp_cards[name] = link # adds the card into the core_set dictionary
@@ -60,6 +60,7 @@ async def on_message(message):
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
         for card in cards:
+            print(card)
             if card.startswith('top ') and len(card.split(' ')) == 2: # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 if num.isdigit():
@@ -70,6 +71,7 @@ async def on_message(message):
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                     if post.title.startswith('[') and not (post.title.startswith('[Update]') and not post.title.startswith('[Card][Update]')):
+                        print('here')
                         links.append(post.url)
                         found = True
                 if not found: # if we didn't find any cards that go by that name
