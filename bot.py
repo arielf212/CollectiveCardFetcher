@@ -41,7 +41,7 @@ def load_core_set(core_set):
             core_set[name] = link # adds the card into the core_set dictionary
 def load_temp_cards(temp_cards):
     '''loads the temp saved cards from temp_cards.csv into a dictionary called temp_cards'''
-    with open('core_set.csv' , 'r') as temp_cards_file:
+    with open('temp_cards.csv' , 'r') as temp_cards_file:
         temp_cards_csv = csv.reader(temp_cards_file , delimiter = ',')
         for row in temp_cards_csv:
             name , link = row # unpack the row into a name and a link
@@ -71,7 +71,6 @@ async def on_message(message):
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                     if post.title.startswith('[') and not (post.title.startswith('[Update]') and not post.title.startswith('[Card][Update]')):
-                        print('here')
                         links.append(post.url)
                         found = True
                 if not found: # if we didn't find any cards that go by that name
@@ -83,6 +82,8 @@ async def on_message(message):
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
 
 #main
+print('main')
 load_core_set(core_set)
 load_temp_cards(temp_cards)
-bot.run(os.environ.get('BOT_TOKEN'))
+print(temp_cards)
+bot.run('NDU4MzUxMjg3MzEwODc2Njcy.Dgm6og.DkUxvrkhmF1ucAbY_oJLD7ocJ-g')
