@@ -44,8 +44,9 @@ def load_temp_cards(temp_cards):
     with open('temp_cards.csv' , 'r') as temp_cards_file:
         temp_cards_csv = csv.reader(temp_cards_file , delimiter = ',')
         for row in temp_cards_csv:
-            name , link = row # unpack the row into a name and a link
-            temp_cards[name] = link # adds the card into the core_set dictionary
+            if row != []: # there is a bug that adds empty lines .this prevent the program from crashing from it
+                name , link = row # unpack the row into a name and a link
+                temp_cards[name] = link # adds the card into the core_set dictionary
 # events
 @bot.event
 async def on_message(message):
