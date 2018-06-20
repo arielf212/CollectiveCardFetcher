@@ -57,7 +57,7 @@ async def on_message(message):
             temp_cards[parameters[1]] = parameters[2] # adds the card to the current dictionary
             await bot.send_message(message.channel , '{} was added!'.format(parameters[1])) # sends confirmation message
             return 0 # quits the function
-        elif parameters == '!alive':
+        elif parameters[0] == '!alive':
             await bot.send_message(message.channel , 'im alive and well!')
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
@@ -80,7 +80,7 @@ async def on_message(message):
                     if card in core_set:
                         links.append(core_set[card])
                     elif card in temp_cards:
-                        links.append(message.channel, temp_cards[card])
+                        links.append(temp_cards[card])
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
 
