@@ -56,6 +56,8 @@ async def on_message(message):
             temp_cards[parameters[1]] = parameters[2] # adds the card to the current dictionary
             await bot.send_message(message.channel , '{} was added!'.format(parameters[1])) # sends confirmation message
             return 0 # quits the function
+        elif parameters == '!alive':
+            await bot.send_message(message.channel , 'im alive and well!')
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
