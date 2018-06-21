@@ -73,7 +73,7 @@ async def on_message(message):
             else:
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
-                    if post.title.startswith('[') and not (post.title.startswith('[Update]') and not post.title.startswith('[Card][Update]')):
+                    if post.title.startswith('[') and not (post.title.startswith('[Update]') and not post.title.startswith('[Card][Update]') and post.title.startswith('[CARD IDEA]')):
                         links.append(post.url)
                         found = True
                 if not found: # if we didn't find any cards that go by that name
