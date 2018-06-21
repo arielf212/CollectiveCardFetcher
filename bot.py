@@ -73,10 +73,14 @@ async def on_message(message):
             else:
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
-                    if post.title.startswith('[') and not (post.title.startswith('[Update]') and not post.title.startswith('[Card][Update]') and  not post.title.startswith('[CARD IDEA]')):
+                    print(post.title)
+                    if post.title.startswith('[') and (not post.title.startswith('[Update]') and not post.title.startswith('[Card][Update]') and  not post.title.startswith('[CARD IDEA]')):
                         links.append(post.url)
                         found = True
+                print(found)
                 if not found: # if we didn't find any cards that go by that name
+                    print(found)
+                    print(card in core_set)
                     if card in core_set:
                         links.append(core_set[card])
                     elif card in temp_cards:
@@ -89,4 +93,4 @@ print('main')
 load_core_set(core_set)
 load_temp_cards(temp_cards)
 print(temp_cards)
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDU4MzUxMjg3MzEwODc2Njcy.Dgm6og.DkUxvrkhmF1ucAbY_oJLD7ocJ-g')
