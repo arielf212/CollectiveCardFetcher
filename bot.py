@@ -74,7 +74,7 @@ async def on_message(message):
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                     print(post.title)
-                    if post.title.startswith('[Card]') or post.title.startswith('[DC'):
+                    if post.title.startswith('[Card]') or post.title.startswith('[DC') or post.title.startswith('[Meta'):
                         links.append(post.url)
                         found = True
                 print(found)
