@@ -9,8 +9,7 @@ collective = reddit.subreddit('collectivecg') # gives access to the Collective s
 
 # discord variables
 bot = commands.Bot(command_prefix='?')
-core_set = {} # here is the core_set saved
-temp_cards = {}
+
 # functions
 def get_card_name(text):
     '''takes a striing and extracts card names from it. card names are encapsulated in [[xxxx]] where xxxx is the card name'''
@@ -32,21 +31,27 @@ def save_card(name , link):
         temp_cards = csv.writer(temp_cards_file , delimiter = ',')
         temp_cards.writerow([name , link])
 
-def load_core_set(core_set):
+def load_core_set():
     '''loads the core set cards from core_set.csv into a dictionary called core_set'''
+    core_set = {}
     with open('core_set.csv' , 'r') as core_set_file:
         core_set_csv = csv.reader(core_set_file , delimiter = ',')
         for row in core_set_csv:
             name , link = row # unpack the row into a name and a link
             core_set[name] = link # adds the card into the core_set dictionary
-def load_temp_cards(temp_cards):
+    return core_set
+
+def load_temp_cards():
     '''loads the temp saved cards from temp_cards.csv into a dictionary called temp_cards'''
+    temp_cards = {}
     with open('temp_cards.csv' , 'r') as temp_cards_file:
         temp_cards_csv = csv.reader(temp_cards_file , delimiter = ',')
         for row in temp_cards_csv:
             if row != []: # there is a bug that adds empty lines .this prevent the program from crashing from it
                 name , link = row # unpack the row into a name and a link
                 temp_cards[name] = link # adds the card into the core_set dictionary
+    return temp_cards
+
 # events
 @bot.event
 async def on_message(message):
@@ -74,7 +79,7 @@ async def on_message(message):
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                     print(post.title)
-                    if post.title.startswith('[Card]') or post.title.startswith('[DC') or post.title.startswith('[Meta'):
+                    if post.title.startswith('[Card]') or post.title.startswith('[DC') or post.title.startswith('[Meta]'):
                         links.append(post.url)
                         found = True
                 print(found)
@@ -85,12 +90,13 @@ async def on_message(message):
                         links.append(core_set[card])
                     elif card in temp_cards:
                         links.append(temp_cards[card])
-        for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
-            await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
+        if links: # if there are any links
+            for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
+                await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
 
 #main
 print('main')
-load_core_set(core_set)
-load_temp_cards(temp_cards)
+core_set = load_core_set()
+temp_cards = load_temp_cards()
 print(temp_cards)
 bot.run(os.environ.get('BOT_TOKEN'))
