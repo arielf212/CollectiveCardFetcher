@@ -64,6 +64,8 @@ async def on_message(message):
             return 0 # quits the function
         elif parameters[0] == '!alive':
             await bot.send_message(message.channel , 'im alive and well!')
+        elif parameters[0] == '!server':
+            await bot.send_message(message.channel , 'https://discordapp.com/api/oauth2/authorize?client_id=458351287310876672&permissions=522304&scope=bot')
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
