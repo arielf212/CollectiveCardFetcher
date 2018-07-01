@@ -1,5 +1,6 @@
 import praw
 from discord.ext import commands
+import asyncio
 import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
 
@@ -12,7 +13,7 @@ bot = commands.Bot(command_prefix='?')
 
 # functions
 def get_card_name(text):
-    '''takes a striing and extracts card names from it. card names are encapsulated in [[xxxx]] where xxxx is the card name'''
+    '''takes a string and extracts card names from it. card names are encapsulated in [[xxxx]] where xxxx is the card name'''
     cards = [] # list of names of cards
     start = text.find('[[')
     while start != -1: # until there are no more brackets
@@ -22,7 +23,7 @@ def get_card_name(text):
         else:
             cards.append(text[start+2:end]) # gets the name of the card
         text = text[end+2 : ] # cuts out the part with the card
-        start = text.find('[[') # and the cicle begins anew
+        start = text.find('[[') # and the circle begins anew
     return cards
 
 def save_card(name , link):
@@ -55,6 +56,7 @@ def load_temp_cards():
 # events
 @bot.event
 async def on_message(message):
+    global last_post , post_channel , does_repost
     if message.content.startswith('!'):
         parameters = message.content.split(' ') # all commands look like this : '!command par1 par2 par3...'
         if parameters[0] == '!save':
@@ -68,6 +70,13 @@ async def on_message(message):
             await bot.send_message(message.channel , 'https://discordapp.com/api/oauth2/authorize?client_id=458351287310876672&permissions=522304&scope=bot')
         elif parameters[0] == '!github' or parameters[0] == '!code':
             await bot.send_message(message.channel , 'https://github.com/fireasembler/CollectiveCardFetcher')
+        elif parameters[0] == '!repost':
+            post_channel = ' '.parameters[1: ]
+            if not does_repost:
+                bot.loop.create_task(post_from_reddit())
+                does_repost = True
+        elif parameters[0] == '!stopost':
+            does_repost = False
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
@@ -98,9 +107,19 @@ async def on_message(message):
             for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
                 await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
 
+async def post_from_reddit():
+    global last_post , post_channel , does_repost
+    if does_repost:
+        for post in collective.new(limit = 1):
+            if post.title != last_post: # if the post title isnt the same as the last post then we can post it
+                await bot.send_message(post_channel , post.url)
+        await asyncio.sleep(10) #runs every ten seconds
+
 #main
-print('main')
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-print(temp_cards)
+global last_post , does_repost
+does_repost = False
+for post in collective.new(limit = 1):
+    last_post = post.title # we need this variable to check if a post was already posted before reposting it
 bot.run(os.environ.get('BOT_TOKEN'))
