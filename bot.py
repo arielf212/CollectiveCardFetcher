@@ -126,4 +126,4 @@ global last_post , does_repost
 does_repost = False
 for post in collective.new(limit = 1):
     last_post = post.title # we need this variable to check if a post was already posted before reposting it
-bot.run('NDU4MzUxMjg3MzEwODc2Njcy.Dgm6og.DkUxvrkhmF1ucAbY_oJLD7ocJ-g')
+bot.run(os.environ.get('BOT-TOKEN'))
