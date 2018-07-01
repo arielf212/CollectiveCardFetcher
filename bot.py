@@ -3,7 +3,6 @@ from discord.ext import commands
 import asyncio
 import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
-
 # Reddit variables
 reddit = praw.Reddit(client_id = 'x4FICJQqO4D14g' , client_secret = 'i9kip94Qs6R4Kfy77XYzDuv0z8Q' , user_agent = 'Card fetcher for collective.') # gives access to reddit
 collective = reddit.subreddit('collectivecg') # gives access to the Collective subreddit
@@ -55,11 +54,14 @@ def load_temp_cards():
 
 async def post_from_reddit():
     global last_post , post_channel , does_repost
-    while does_repost:
-        for post in collective.new(limit = 1):
-            if post.title != last_post: # if the post title isnt the same as the last post then we can post it
-                await bot.send_message(post_channel , post.url)
-        await asyncio.sleep(10) #runs every ten seconds
+    while True:
+        if does_repost:
+            for post in collective.new(limit = 1):
+                print(post.title + " " + last_post)
+                if post.title != last_post: # if the post title isnt the same as the last post then we can post it
+                    await bot.send_message(post_channel , post.url)
+                    last_post = post.title
+            await asyncio.sleep(10) #runs every ten seconds
 
 # events
 @bot.event
@@ -79,7 +81,8 @@ async def on_message(message):
         elif parameters[0] == '!github' or parameters[0] == '!code':
             await bot.send_message(message.channel , 'https://github.com/fireasembler/CollectiveCardFetcher')
         elif parameters[0] == '!repost':
-            post_channel = ' '.parameters[1: ]
+            print("reposrty")
+            post_channel = message.channel
             does_repost = True
         elif parameters[0] == '!stopost':
             does_repost = False
@@ -123,4 +126,4 @@ global last_post , does_repost
 does_repost = False
 for post in collective.new(limit = 1):
     last_post = post.title # we need this variable to check if a post was already posted before reposting it
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDU4MzUxMjg3MzEwODc2Njcy.Dgm6og.DkUxvrkhmF1ucAbY_oJLD7ocJ-g')
