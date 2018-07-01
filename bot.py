@@ -53,6 +53,14 @@ def load_temp_cards():
                 temp_cards[name] = link # adds the card into the core_set dictionary
     return temp_cards
 
+async def post_from_reddit():
+    global last_post , post_channel , does_repost
+    while does_repost:
+        for post in collective.new(limit = 1):
+            if post.title != last_post: # if the post title isnt the same as the last post then we can post it
+                await bot.send_message(post_channel , post.url)
+        await asyncio.sleep(10) #runs every ten seconds
+
 # events
 @bot.event
 async def on_message(message):
@@ -72,9 +80,7 @@ async def on_message(message):
             await bot.send_message(message.channel , 'https://github.com/fireasembler/CollectiveCardFetcher')
         elif parameters[0] == '!repost':
             post_channel = ' '.parameters[1: ]
-            if not does_repost:
-                bot.loop.create_task(post_from_reddit())
-                does_repost = True
+            does_repost = True
         elif parameters[0] == '!stopost':
             does_repost = False
     else:
@@ -106,15 +112,9 @@ async def on_message(message):
         if links: # if there are any links
             for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
                 await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
-
-async def post_from_reddit():
-    global last_post , post_channel , does_repost
-    if does_repost:
-        for post in collective.new(limit = 1):
-            if post.title != last_post: # if the post title isnt the same as the last post then we can post it
-                await bot.send_message(post_channel , post.url)
-        await asyncio.sleep(10) #runs every ten seconds
-
+@bot.event
+async def on_ready():
+    bot.loop.create_task(post_from_reddit())
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
