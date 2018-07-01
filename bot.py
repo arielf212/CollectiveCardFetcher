@@ -52,21 +52,9 @@ def load_temp_cards():
                 temp_cards[name] = link # adds the card into the core_set dictionary
     return temp_cards
 
-async def post_from_reddit():
-    global last_post , post_channel , does_repost
-    while True:
-        if does_repost:
-            for post in collective.new(limit = 1):
-                print(post.title + " " + last_post)
-                if post.title != last_post: # if the post title isnt the same as the last post then we can post it
-                    await bot.send_message(post_channel , post.url)
-                    last_post = post.title
-            await asyncio.sleep(10) #runs every ten seconds
-
 # events
 @bot.event
 async def on_message(message):
-    global last_post , post_channel , does_repost
     if message.content.startswith('!'):
         parameters = message.content.split(' ') # all commands look like this : '!command par1 par2 par3...'
         if parameters[0] == '!save':
@@ -80,12 +68,6 @@ async def on_message(message):
             await bot.send_message(message.channel , 'https://discordapp.com/api/oauth2/authorize?client_id=458351287310876672&permissions=522304&scope=bot')
         elif parameters[0] == '!github' or parameters[0] == '!code':
             await bot.send_message(message.channel , 'https://github.com/fireasembler/CollectiveCardFetcher')
-        elif parameters[0] == '!repost':
-            print("reposrty")
-            post_channel = message.channel
-            does_repost = True
-        elif parameters[0] == '!stopost':
-            does_repost = False
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
@@ -115,15 +97,8 @@ async def on_message(message):
         if links: # if there are any links
             for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
                 await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
-@bot.event
-async def on_ready():
-    bot.loop.create_task(post_from_reddit())
 
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-global last_post , does_repost
-does_repost = False
-for post in collective.new(limit = 1):
-    last_post = post.title # we need this variable to check if a post was already posted before reposting it
 bot.run(os.environ.get('BOT_TOKEN'))
