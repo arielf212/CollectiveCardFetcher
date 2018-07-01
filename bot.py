@@ -115,6 +115,7 @@ async def on_message(message):
 @bot.event
 async def on_ready():
     bot.loop.create_task(post_from_reddit())
+
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
