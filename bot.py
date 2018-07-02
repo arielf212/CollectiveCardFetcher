@@ -58,7 +58,7 @@ async def on_message(message):
     if message.content.startswith('!'):
         parameters = message.content.split(' ') # all commands look like this : '!command par1 par2 par3...'
         if parameters[0] == '!save':
-            save_card(parameters[1] , parameters[2]) # saved the card data (name , link) into the csv with temp cards.
+            save_card(' '.join(parameters[1:-1]), parameters[-1]) # saved the card data (name , link) into the csv with temp cards.
             temp_cards[parameters[1]] = parameters[2] # adds the card to the current dictionary
             await bot.send_message(message.channel , '{} was added!'.format(parameters[1])) # sends confirmation message
             return 0 # quits the function
