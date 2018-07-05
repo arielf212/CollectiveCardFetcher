@@ -5,11 +5,15 @@ import asyncio
 import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
 # Reddit variables
-reddit = praw.Reddit(client_id = 'x4FICJQqO4D14g' , client_secret = 'i9kip94Qs6R4Kfy77XYzDuv0z8Q' , user_agent = 'Card fetcher for collective.') # gives access to reddit
+reddit = praw.Reddit(client_id = 'x4FICJQqO4D14g' , client_secret = 'i9kip94Qs6R4Kfy77XYzDuv0z8Q' , user_agent = 'Card fetcher for Collective.') # gives access to reddit
 collective = reddit.subreddit('collectivecg') # gives access to the Collective subreddit
 
 # discord variables
 bot = commands.Bot(command_prefix='?')
+
+#regular variables
+global post
+post = False
 
 # functions
 def get_card_name(text):
@@ -53,6 +57,19 @@ def load_temp_cards():
                 temp_cards[name] = link # adds the card into the core_set dictionary
     return temp_cards
 
+def get_card():
+    '''fetches the newest card from reddit'''
+    for card in collective.new(limit = 1):
+        return card.title
+
+async def repost_card(post_channel):
+    last_card = get_card()
+    while True:
+        card = get_card()
+        if card != last_card:
+            await bot.send_message(post_channel , card)
+        await asyncio.sleep(10)
+
 def get_link(card):
     max_ratio = (' ', 0)  # maximum score in ratio exam
     max_partial = (' ', 0)  # maximum sort in partial ratio exam
@@ -78,9 +95,11 @@ def get_link(card):
     if max_partial[1] > max_ratio[1]:
         return search_list[max_partial[0]]
     return search_list[max_ratio[0]]
+
 # events
 @bot.event
 async def on_message(message):
+    global post
     if message.content.startswith('!'):
         parameters = message.content.split(' ') # all commands look like this : '!command par1 par2 par3...'
         if parameters[0] == '!save':
@@ -94,6 +113,13 @@ async def on_message(message):
             await bot.send_message(message.channel , 'https://discordapp.com/api/oauth2/authorize?client_id=458351287310876672&permissions=522304&scope=bot')
         elif parameters[0] == '!github' or parameters[0] == '!code':
             await bot.send_message(message.channel , 'https://github.com/fireasembler/CollectiveCardFetcher')
+        elif parameters[0] == '!start':
+            post = True
+            await bot.send_message(message.channel, 'will start posting here!')
+            bot.loop.create_task(repost_card(message.channel))
+        elif parameters[0] == '!stop':
+            post = False
+            await bot.send_message(message.channel, "will stop!")
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
