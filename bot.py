@@ -1,5 +1,6 @@
 import praw
 from discord.ext import commands
+from fuzzywuzzy import fuzz
 import asyncio
 import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
@@ -52,6 +53,29 @@ def load_temp_cards():
                 temp_cards[name] = link # adds the card into the core_set dictionary
     return temp_cards
 
+def get_link(card):
+    max_ratio = (' ', 0)  # maximum score in ratio exam
+    max_partial = (' ', 0)  # maximum sort in partial ratio exam
+    #lets put the core_set and temp_cards together
+    search_list = temp_cards.copy()
+    search_list.update(core_set)
+    for entry in search_list:
+        # lets check if an entry is "good enough" to be our card
+        ratio = fuzz.ratio(card, entry)
+        partial = fuzz.partial_ratio(card, entry)
+        if ratio > max_ratio[1]:
+            max_ratio = (entry, ratio)
+            list_ratio = [max_ratio]
+        elif ratio == max_ratio[1]:
+            list_ratio.append((entry, ratio))
+        if partial > max_partial[1]:
+            max_partial = (entry, partial)
+            list_partial = [max_partial]
+        elif partial == max_partial[1]:
+            list_partial.append((entry, partial))
+    if max_partial[1] > max_ratio[1]:
+        return search_list[max_partial[0]]
+    return search_list[max_ratio[0]]
 # events
 @bot.event
 async def on_message(message):
@@ -82,18 +106,11 @@ async def on_message(message):
             else:
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
-                    print(post.title)
                     if post.title.startswith('[Card]') or post.title.startswith('[DC') or post.title.startswith('[Meta]'):
                         links.append(post.url)
                         found = True
-                print(found)
                 if not found: # if we didn't find any cards that go by that name
-                    print(found)
-                    print(card in core_set)
-                    if card in core_set:
-                        links.append(core_set[card])
-                    elif card in temp_cards:
-                        links.append(temp_cards[card])
+                    links.append(get_link(card))
         if links: # if there are any links
             for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
                 await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
