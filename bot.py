@@ -56,6 +56,8 @@ def load_temp_cards():
 def get_link(card):
     max_ratio = (' ', 0)  # maximum score in ratio exam
     max_partial = (' ', 0)  # maximum sort in partial ratio exam
+    list_ratio = []
+    list_partial = []
     #lets put the core_set and temp_cards together
     search_list = temp_cards.copy()
     search_list.update(core_set)
@@ -118,4 +120,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDU4MzUxMjg3MzEwODc2Njcy.Dgm6og.DkUxvrkhmF1ucAbY_oJLD7ocJ-g')
