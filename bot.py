@@ -125,12 +125,11 @@ async def on_message(message):
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
         for card in cards:
-            print(card)
             if card.startswith('top ') and len(card.split(' ')) == 2: # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 if num.isdigit():
                     num = int(num)
-                    for post in collective.top(limit = int(num) , time_filter='week'):
+                    for post in collective.search('flair:(week 8)',limit = int(num) , sort = 'top'):
                         links.append(post.url)
             else:
                 found = False
