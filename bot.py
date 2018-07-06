@@ -60,7 +60,7 @@ def load_temp_cards():
 def get_card():
     '''fetches the newest card from reddit'''
     for card in collective.new(limit = 1):
-        return card.permalink
+        return 'https://www.reddit.com' + card.permalink
 
 async def repost_card(post_channel):
     last_card = get_card()
