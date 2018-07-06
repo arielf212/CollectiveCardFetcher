@@ -60,13 +60,14 @@ def load_temp_cards():
 def get_card():
     '''fetches the newest card from reddit'''
     for card in collective.new(limit = 1):
-        return card.title
+        return card.permalink
 
 async def repost_card(post_channel):
     last_card = get_card()
     while True:
         card = get_card()
         if card != last_card:
+            last_card = card
             await bot.send_message(post_channel , card)
         await asyncio.sleep(10)
 
