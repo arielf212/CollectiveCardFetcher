@@ -125,12 +125,20 @@ async def on_message(message):
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
         for card in cards:
-            if card.startswith('top ') and len(card.split(' ')) == 2: # the name looks like this :"top X"
-                num = card.split(' ')[1]
-                if num.isdigit():
-                    num = int(num)
-                    for post in collective.search('flair:(week 8)',limit = int(num) , sort = 'top'):
-                        links.append(post.url)
+            if card.startswith('top '):
+                if len(card.split(' ')) == 2: # the name looks like this :"top X"
+                    num = card.split(' ')[1]
+                    if num.isdigit():
+                        num = int(num)
+                        for post in collective.search('flair:(week 8)',limit = int(num) , sort = 'top'):
+                            links.append(post.url)
+                elif len(card.split(' ')) == 4 and card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
+                    num = card.split(' ')[1]
+                    week = card.split(' ')[3]
+                    if num.isdigit() and week.isdigit():
+                        num = int(num)
+                        for post in collective.search('flair:(week ' + week + ')',limit = int(num) , sort = 'top'):
+                            links.append(post.url)
             else:
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
