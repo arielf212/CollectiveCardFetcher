@@ -111,7 +111,7 @@ async def on_message(message):
         elif parameters[0] == '!alive':
             await bot.send_message(message.channel , 'im alive and well!')
         elif parameters[0] == '!server':
-            await bot.send_message(message.channel , 'https://discordapp.com/api/oauth2/authorize?client_id=458351287310876672&permissions=522304&scope=bot')
+            await bot.send_message(message.channel , 'https://discordapp.com/api/oauth2/authorize?client_id=465866501715525633&permissions=522304&scope=bot')
         elif parameters[0] == '!github' or parameters[0] == '!code':
             await bot.send_message(message.channel , 'https://github.com/fireasembler/CollectiveCardFetcher')
         elif parameters[0] == '!start':
