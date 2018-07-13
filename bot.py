@@ -121,7 +121,7 @@ async def on_message(message):
         elif parameters[0] == '!stop':
             post = False
             await bot.send_message(message.channel, "will stop!")
-        elif parameters[0] == '!nice' and parameters[1] in ['card', 'card!']:
+        elif parameters[0] == '!nice' and parameters[1] in ['art', 'art!']:
             await bot.send_message(message.chanel , 'https://files.collective.gg/p/cards/ed4a17f0-86c7-11e8-9aba-5d6fb692aedc-s.png')
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
