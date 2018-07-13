@@ -132,7 +132,7 @@ async def on_message(message):
                     num = card.split(' ')[1]
                     if num.isdigit():
                         num = int(num)
-                        for post in collective.search('flair:(week 8)',limit = int(num) , sort = 'top'):
+                        for post in collective.search('flair:(week 9)',limit = int(num) , sort = 'top'):
                             links.append(post.url)
                 elif len(card.split(' ')) == 4 and card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
                     num = card.split(' ')[1]
