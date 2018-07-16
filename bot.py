@@ -97,6 +97,18 @@ def get_link(card):
         return search_list[max_partial[0]]
     return search_list[max_ratio[0]]
 
+def get_top(num , week):
+    return_list = []
+    index = 1
+    while index <= num:
+        post = collective.search('flair:(week ' + str(week) + ')',limit = index , sort = 'top')[-1]
+        if post.title.startswith('[Cosmetic'):
+            num+=1
+        else:
+            return_list.append(post.url)
+            index+=1
+    return return_list
+
 # events
 @bot.event
 async def on_message(message):
@@ -131,18 +143,12 @@ async def on_message(message):
                 if len(card.split(' ')) == 2: # the name looks like this :"top X"
                     num = card.split(' ')[1]
                     if num.isdigit():
-                        num = int(num)
-                        for post in collective.search('flair:(week 9)',limit = int(num) , sort = 'top'):
-                            if not post.title.startswith('[Cosmetic'):
-                                links.append(post.url)
+                        links += get_top(int(num) , 9)
                 elif len(card.split(' ')) == 4 and card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
                     num = card.split(' ')[1]
                     week = card.split(' ')[3]
                     if num.isdigit() and week.isdigit():
-                        num = int(num)
-                        for post in collective.search('flair:(week ' + week + ')',limit = int(num) , sort = 'top'):
-                            if not post.title.startswith('[Cosmetic'):
-                                links.append(post.url)
+                        links += get_top(int(num) , int(week))
             else:
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
@@ -158,4 +164,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run('NDY1ODY2NTAxNzE1NTI1NjMz.Divf2w.tMBTpbCl_2PmllPJRdLJrtb3LSw')
+bot.run(os.environ.get('BOT_TOKEN'))
