@@ -133,14 +133,16 @@ async def on_message(message):
                     if num.isdigit():
                         num = int(num)
                         for post in collective.search('flair:(week 9)',limit = int(num) , sort = 'top'):
-                            links.append(post.url)
+                            if not post.title.startswith('[Cosmetic'):
+                                links.append(post.url)
                 elif len(card.split(' ')) == 4 and card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
                     num = card.split(' ')[1]
                     week = card.split(' ')[3]
                     if num.isdigit() and week.isdigit():
                         num = int(num)
                         for post in collective.search('flair:(week ' + week + ')',limit = int(num) , sort = 'top'):
-                            links.append(post.url)
+                            if not post.title.startswith('[Cosmetic'):
+                                links.append(post.url)
             else:
                 found = False
                 for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
@@ -156,4 +158,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDY1ODY2NTAxNzE1NTI1NjMz.Divf2w.tMBTpbCl_2PmllPJRdLJrtb3LSw')
