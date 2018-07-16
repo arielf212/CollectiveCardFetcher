@@ -106,9 +106,12 @@ def get_top(num , week):
             post = submission
         if post.title.startswith('[Cosmetic'):
             num+=1
+            index+=1
         else:
             return_list.append(post.url)
+            print(post.title)
             index+=1
+        print(post.title + ',' + str(index) + "," + str(num))
     return return_list
 
 # events
@@ -166,4 +169,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDY1ODY2NTAxNzE1NTI1NjMz.Di5KXg.TGUc5f8rEZauLQH1d_KN1RQyXuk')
