@@ -109,9 +109,7 @@ def get_top(num , week):
             index+=1
         else:
             return_list.append(post.url)
-            print(post.title)
             index+=1
-        print(post.title + ',' + str(index) + "," + str(num))
     return return_list
 
 # events
