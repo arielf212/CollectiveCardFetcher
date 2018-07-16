@@ -169,4 +169,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run('NDY1ODY2NTAxNzE1NTI1NjMz.Di5KXg.TGUc5f8rEZauLQH1d_KN1RQyXuk')
+bot.run(os.environ.get('BOT_TOKEN'))
