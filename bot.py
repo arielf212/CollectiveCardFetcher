@@ -144,6 +144,9 @@ async def on_message(message):
         elif parameters[0].startswith('!bad'):
             os.environ['BAD'] = str(int(os.environ['BAD']) + 1)
             await bot.send_message(message.channel , 'ill try better next time :(')
+        elif parameters[0] == '!score':
+            await bot.send_message(message.channel , 'good: ' + os.environ.get('GOOD'))
+            await bot.send_message(message.channel ,'bad: ' + os.environ.get('BAD'))
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
         links = [] # here are the card links stored
