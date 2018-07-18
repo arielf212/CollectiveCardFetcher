@@ -139,10 +139,10 @@ async def on_message(message):
         elif parameters[0] == '!nice' and parameters[1] in ['art', 'art!']:
             await bot.send_file(message.channel , 'nice art.jpg')
         elif parameters[0].startswith('!good'):
-            os.environ['GOOD'] += 1
+            os.environ['GOOD'] = str(int(os.environ['GOOD']) + 1)
             await bot.send_message(message.channel , 'thank you! :)')
         elif parameters[0].startswith('!bad'):
-            os.environ['BAD'] +=1
+            os.environ['BAD'] = str(int(os.environ['BAD']) + 1)
             await bot.send_message(message.channel , 'ill try better next time :(')
     else:
         cards = get_card_name(message.content) # this gets all card names in the message
