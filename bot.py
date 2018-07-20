@@ -155,7 +155,7 @@ async def on_message(message):
                 if len(card.split(' ')) == 2: # the name looks like this :"top X"
                     num = card.split(' ')[1]
                     if num.isdigit():
-                        links += get_top(int(num) , 9)
+                        links += get_top(int(num) , os.environ.get('WEEK'))
                 elif len(card.split(' ')) == 4 and card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
                     num = card.split(' ')[1]
                     week = card.split(' ')[3]
