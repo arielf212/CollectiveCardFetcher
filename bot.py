@@ -104,7 +104,7 @@ def get_top(num , week):
         post = ''
         for submission in collective.search('flair:(week ' + str(week) + ')',limit = index , sort = 'top'):
             post = submission
-        if post.title.startswith('[Cosmetic'):
+        if post.title.startswith('[Cosmetic') or post.title.startswith('[DC'):
             num+=1
             index+=1
         else:
