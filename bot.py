@@ -183,7 +183,7 @@ async def on_message(message):
             found = False
             print(mod)
             if mod == 'none':
-                for post in collective.search(card , limit = 1, sort= 'new'): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
+                for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                     if post.title.startswith('['):
                         links.append(post.url)
                         found = True
