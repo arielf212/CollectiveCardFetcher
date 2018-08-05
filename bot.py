@@ -20,6 +20,7 @@ embed.add_field(name = '!nice' , value = 'The bot will respond with a "nice art!
 embed.add_field(name = '!good' , value = 'Ups the score of the bot. Will make the bot respond with a thankful message.')
 embed.add_field(name = '!bad', value = 'Reduces the score of the bot. Will make the bot respond with an apologetic message.')
 embed.add_field(name = '!score' , value = 'the bot will respond with the amount of votes given to him trough !bad and !good')
+wmbed.add_field(name = '!new', value = 'needs to be used with one of the following topics after: incubation, turns, keywords or collection. will return an explanation about said topic')
 bot.remove_command('help')
 
 # functions
@@ -158,6 +159,16 @@ async def score():
     await bot.say('good: ' + os.environ.get('GOOD'))
     await bot.say('bad: ' + os.environ.get('BAD'))
 
+@bot.command()
+async def new(link):
+    if link == 'incubation':
+        await bot.say("Hey! Welcome to the Collective discord server! We are in incubation mode right now, which means that no new alpha keys are being given out while the devs are working on new features for the game. You can still submit cards by proxy via the Editor Workshop channels (Art_Sharing for art, Card_Lab for design, Editor_Help for programming), many of our members would be happy to help you out there. Keep an eye out for opportunities for keys, as we occasionally host competitions that allow new players to receive a key if they join.\n\nSince many of our newcomers used to be disinclined to speak up, some of our members have put themselves forth as an offering to encourage activity. FireofGods will change his identity to the CardFetcherSpam bot for 24 hours for every new user who speaks up, while Feathers will change his name to any avian of your choice (real or fictional) for the same duration. Also, we have cake.\n\nIf you have any other question about the game, just ask. Have a great time here!")
+    elif link == 'collection':
+        await bot.say("https://www.collective.gg/collection")
+    elif link == 'keywords':
+        await bot.say('https://www.collective.gg/howtoplay2')
+    elif link == 'turns':
+        await bot.say("Each turn has two phases, the playing card/abilities phase, then the attack/block phase\nDuring the first phase, a player is assigned initiative, which alternates between players each turn\nPlayers simultaneously play their cards and activate unit abilities (actives). Their decisions don't happen immediately, but go on a stack where they wait to be resolved, until both players finished making their choices. Then, starting with the player with initiative, all cards/abilities are resolved in the order they were selected in.\nAfter all of the effects of the cards/abilities of the initiative player resolves, then all of the non-initiative player's actions resolve. That ends the first phase.\nDuring the second phase, players again make simultaneous decisions that don't take effect until both have confirmed their choices. Attackers are selected first. After those choices are locked in, then defenders are selected. After defenders are locked in, combat happens normally. The attack value of a unit is dealt cumulatively to each defender, not the same amount to each. As in - if you block an attacker with 1 attack and 2 health with two 1/1s, only one of them will die. The order in which you select blocks is the order in which units block. This can lead to situations where you block the 1/2 with a 0/3 and a 1/1 deadly, and the deadly unit will kill the 1/2 without taking damage, because you selected it to block second")
 @bot.command()
 async def help():
     await bot.say(embed=embed)
