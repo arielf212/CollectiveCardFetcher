@@ -20,7 +20,7 @@ embed.add_field(name = '!nice' , value = 'The bot will respond with a "nice art!
 embed.add_field(name = '!good' , value = 'Ups the score of the bot. Will make the bot respond with a thankful message.')
 embed.add_field(name = '!bad', value = 'Reduces the score of the bot. Will make the bot respond with an apologetic message.')
 embed.add_field(name = '!score' , value = 'the bot will respond with the amount of votes given to him trough !bad and !good')
-wmbed.add_field(name = '!new', value = 'needs to be used with one of the following topics after: incubation, turns, keywords or collection. will return an explanation about said topic')
+embed.add_field(name = '!new', value = 'needs to be used with one of the following topics after: incubation, turns, keywords or collection. will return an explanation about said topic')
 bot.remove_command('help')
 
 # functions
