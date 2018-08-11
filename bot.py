@@ -118,8 +118,8 @@ def get_link(card):
 def get_mtg(card):
     '''sends an image file of the mtg card'''
     # check scryfall api at scryfall website
-    available = requests.get('https://api.scryfall.com/cards/autocomplete/', {'q': card}).json()
-    if len(available['data']) > 0:
+    available = requests.get('https://api.scryfall.com/cards/named/', {'fuzzy': card}).json()
+    if available['object'] == 'card':
         return 'https://api.scryfall.com/cards/named?fuzzy={};format=image;version=png'.format(card.replace(' ', '%20'))
     return "sorry, couldn't find {}. please try again.".format(card)
 
