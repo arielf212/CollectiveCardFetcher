@@ -1,6 +1,7 @@
 import praw
 from discord.ext import commands
 import discord
+import requests # this is for the mtg search
 from fuzzywuzzy import fuzz
 import asyncio
 import os # I need this to use environment variables on heroku
@@ -114,6 +115,14 @@ def get_link(card):
         return search_list[max_partial[0]]
     return search_list[max_ratio[0]]
 
+def get_mtg(card):
+    '''sends an image file of the mtg card'''
+    # check scryfall api at scryfall website
+    available = requests.get('https://api.scryfall.com/cards/autocomplete/', {'q': card}).json()
+    if len(available['data']) > 0:
+        return 'https://api.scryfall.com/cards/named?fuzzy={};format=image;version=png'.format(card.replace(' ', '%20'))
+    return "sorry, couldn't find {}. please try again.".format(card)
+
 def get_top(num , week):
     return_list = []
     index = 1
@@ -191,15 +200,17 @@ async def on_message(message):
                 if num.isdigit() and week.isdigit():
                     links += get_top(int(num) , int(week))
         else:
-            found = False
-            print(mod)
-            if mod == 'none':
-                for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
-                    if post.title.startswith('['):
-                        links.append(post.url)
-                        found = True
-            if not found: # if we didn't find any cards that go by that name
-                links.append(get_link(card))
+            if mod == 'none' or mod == 'core':
+                found = False
+                if mod == 'none':
+                    for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
+                        if post.title.startswith('['):
+                            links.append(post.url)
+                            found = True
+                if not found: # if we didn't find any cards that go by that name
+                    links.append(get_link(card))
+            elif mod == 'mtg':
+                links.append(get_mtg(card))
     if links: # if there are any links
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
@@ -208,4 +219,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDczNTM5NjU3Mzg5NTcyMTAx.Dk9Gzw.sgyHks3GczrlCTgTT5X9Hy0lUhw')
