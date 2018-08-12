@@ -171,19 +171,39 @@ async def score():
 @bot.command()
 async def new(link):
     if link == 'incubation':
-        await bot.say("Hey! Welcome to the Collective discord server! We are in incubation mode right now, which means that no new alpha keys are being given out while the devs are working on new features for the game. You can still submit cards by proxy via the Editor Workshop channels (Art_Sharing for art, Card_Lab for design, Editor_Help for programming), many of our members would be happy to help you out there. Keep an eye out for opportunities for keys, as we occasionally host competitions that allow new players to receive a key if they join.\n\nSince many of our newcomers used to be disinclined to speak up, some of our members have put themselves forth as an offering to encourage activity. FireofGods will change his identity to the CardFetcherSpam bot for 24 hours for every new user who speaks up, while Feathers will change his name to any avian of your choice (real or fictional) for the same duration. Also, we have cake.\n\nIf you have any other question about the game, just ask. Have a great time here!")
+        await bot.say("We are in incubation mode right now, which means that no new alpha keys are being given out while the devs are working on new features for the game. If you don't have a key, which is required to access the editor and create cards, you can still submit cards by proxy via the Editor Workshop channels ( #card-lab-🔬 for design, #art-sharing  for art, #editor-help  for programming). Many of our members would be happy to help you out there. Keep an eye out for opportunities for keys, as we occasionally host competitions that allow new players to receive a key if they join.")
     elif link == 'collection':
         await bot.say("https://www.collective.gg/collection")
     elif link == 'keywords':
         await bot.say('https://www.collective.gg/howtoplay2')
     elif link == 'turns':
-        await bot.say("Each turn has two phases, the playing card/abilities phase, then the attack/block phase\nDuring the first phase, a player is assigned initiative, which alternates between players each turn\nPlayers simultaneously play their cards and activate unit abilities (actives). Their decisions don't happen immediately, but go on a stack where they wait to be resolved, until both players finished making their choices. Then, starting with the player with initiative, all cards/abilities are resolved in the order they were selected in.\nAfter all of the effects of the cards/abilities of the initiative player resolves, then all of the non-initiative player's actions resolve. That ends the first phase.\nDuring the second phase, players again make simultaneous decisions that don't take effect until both have confirmed their choices. Attackers are selected first. After those choices are locked in, then defenders are selected. After defenders are locked in, combat happens normally. The attack value of a unit is dealt cumulatively to each defender, not the same amount to each. As in - if you block an attacker with 1 attack and 2 health with two 1/1s, only one of them will die. The order in which you select blocks is the order in which units block. This can lead to situations where you block the 1/2 with a 0/3 and a 1/1 deadly, and the deadly unit will kill the 1/2 without taking damage, because you selected it to block second")
+        await bot.say("Each turn has two main phases. They are first the card/abilities phase, then the attack/block phase. At start of turn, each player first draws 1 card and gains 1 EXP.\n\nDuring the first phase, a player is assigned initiative, which alternates between players each turn. Players simultaneously play their cards and activate unit abilities (actives). Their decisions don't happen immediately, but go on a stack where they wait to be resolved, until both players finished making their choices. Then, starting with the player with initiative, all cards/abilities are resolved in the order they were selected in. After all of the effects of the cards/abilities of the initiative player resolves, then all of the non-initiative player's actions resolve. That ends the first phase.\n\nDuring the second phase, players again make simultaneous decisions that don't take effect until both have confirmed their choices. Attackers are selected first. After those choices are locked in, then defenders are selected. After defenders are locked in, combat happens. The initiative player's attackers deal their atk to their respective blockers' hp, or to the opponent's hp if unblocked. The attack value of a unit is dealt cumulatively to each defender, not the same amount to each. If an 1/2 attacker is blocked with two 1/1s, only one of the 1/1s will die. The order in which you select blocks is the order in which units block. This can lead to situations where a 1/2 is blocked with a vanilla 0/3 and a 1/1 deadly, and the deadly unit will kill the 1/2 without taking damage, because it was selected it to block second.")
+    else:
+        await bot.say("{} isnt a link I can  give. the current links are: incubation,collection,keywords,turns".format(link))
 
 @bot.command(pass_context=True)
 async def say(ctx):
     if ctx.message.author.id == '223876086994436097':
         await bot.delete_message(ctx.message)
         await bot.say(' '.join(ctx.message.content.split(' ')[1:]))
+
+@bot.command(pass_context=True)
+async def image(ctx,link):
+    if link.startswith('https://files.collective.gg/p/cards/'):
+        card_id = '-'.join(link.split('/')[-1].split('-')[ :-1])
+        card_data = requests.get('https://server.collective.gg/api/card/'+card_id).json()
+        if len(card_data) > 1:
+            for prop in card_data['card']['Text']['Properties']:
+                if prop['Symbol']['Name'] == 'PortraitUrl':
+                    os.remove('card.png')
+                    with open('card.png' , 'wb+') as img:
+                        img_link =  requests.get(prop['Expression']['Value'])
+                        img.write(img_link.content)
+                        await bot.send_file(ctx.message.channel, 'card.png')
+        else:
+            await bot.say('sorry, card was not found')
+    else:
+        await bot.say('sorry, but this isnt a link!')
 @bot.command()
 async def help():
     await bot.say(embed=embed)
@@ -225,4 +245,4 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run('NDczNTM5NjU3Mzg5NTcyMTAx.DlHsGQ.4AxPth2KUspXEaIs9jknxR78chs')
