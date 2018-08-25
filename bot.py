@@ -124,7 +124,15 @@ def get_link(card):
         return search_list[max_partial[0]]
     return search_list[max_ratio[0]]
 
-def get_link(card):
+def get_mtg(card):
+    '''sends an image file of the mtg card'''
+    # check scryfall api at scryfall website
+    available = requests.get('https://api.scryfall.com/cards/named/', {'fuzzy': card}).json()
+    if available['object'] == 'card':
+        return 'https://api.scryfall.com/cards/named?fuzzy={};format=image;version=png'.format(card.replace(' ', '%20'))
+    return "sorry, couldn't find {}. please try again.".format(card)
+
+def get_stormbound(card):
     max_ratio = (' ', 0)  # maximum score in ratio exam
     max_partial = (' ', 0)  # maximum sort in partial ratio exam
     for entry in stormbound_cards:
@@ -144,14 +152,6 @@ def get_link(card):
     if max_partial[1] > max_ratio[1]:
         return stormbound_cards[max_partial[0]]
     return stormbound_cards[max_ratio[0]]
-
-def get_mtg(card):
-    '''sends an image file of the mtg card'''
-    # check scryfall api at scryfall website
-    available = requests.get('https://api.scryfall.com/cards/named/', {'fuzzy': card}).json()
-    if available['object'] == 'card':
-        return 'https://api.scryfall.com/cards/named?fuzzy={};format=image;version=png'.format(card.replace(' ', '%20'))
-    return "sorry, couldn't find {}. please try again.".format(card)
 
 def get_top(num , week):
     return_list = []
@@ -275,7 +275,7 @@ async def on_message(message):
             elif mod == 'mtg':
                 links.append(get_mtg(card))
             elif mod == 'sb':
-                links.append(g)
+                links.append(get_stormbound(card))
     if links: # if there are any links
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
