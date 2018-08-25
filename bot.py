@@ -38,7 +38,7 @@ def get_card_name(text):
             if query.find(':') > 0:
                 mod = query[:query.find(':')].lower()
                 card = query[query.find(':')+1:]
-                if mod not in ['hs','eternal','mtg','core','reddit','dc','ygo','sb']:
+                if mod not in ['mtg','core','sb']:
                     card = query
                     mod = 'none'
                 cards.append((mod,card))
@@ -74,6 +74,15 @@ def load_temp_cards():
                 name , link = row # unpack the row into a name and a link
                 temp_cards[name] = link # adds the card into the core_set dictionary
     return temp_cards
+
+def load_stormbound_cards():
+    cards = {}
+    with open('card_list' , 'r') as fcard_list:
+        card_list = csv.reader(fcard_list , delimiter = '%')
+        for row in card_list:
+            name , link = row
+            cards[name] = link
+    return cards
 
 def get_card():
     '''fetches the newest card from reddit'''
@@ -114,6 +123,27 @@ def get_link(card):
     if max_partial[1] > max_ratio[1]:
         return search_list[max_partial[0]]
     return search_list[max_ratio[0]]
+
+def get_link(card):
+    max_ratio = (' ', 0)  # maximum score in ratio exam
+    max_partial = (' ', 0)  # maximum sort in partial ratio exam
+    for entry in stormbound_cards:
+        # lets check if an entry is "good enough" to be our card
+        ratio = fuzz.ratio(card, entry)
+        partial = fuzz.partial_ratio(card, entry)
+        if ratio > max_ratio[1]:
+            max_ratio = (entry, ratio)
+            list_ratio = [max_ratio]
+        elif ratio == max_ratio[1]:
+            list_ratio.append((entry, ratio))
+        if partial > max_partial[1]:
+            max_partial = (entry, partial)
+            list_partial = [max_partial]
+        elif partial == max_partial[1]:
+            list_partial.append((entry, partial))
+    if max_partial[1] > max_ratio[1]:
+        return stormbound_cards[max_partial[0]]
+    return stormbound_cards[max_ratio[0]]
 
 def get_mtg(card):
     '''sends an image file of the mtg card'''
@@ -244,6 +274,8 @@ async def on_message(message):
                     links.append(get_link(card))
             elif mod == 'mtg':
                 links.append(get_mtg(card))
+            elif mod == 'sb':
+                links.append(g)
     if links: # if there are any links
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
@@ -252,4 +284,5 @@ async def on_message(message):
 #main
 core_set = load_core_set()
 temp_cards = load_temp_cards()
+stormbound_cards = load_stormbound_cards()
 bot.run(os.environ.get('BOT_TOKEN'))
