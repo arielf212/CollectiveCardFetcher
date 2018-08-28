@@ -243,7 +243,7 @@ async def image(ctx,link):
         await bot.say('sorry, but this isnt a link!')
 @bot.command(pass_context=True)
 async def squidward(ctx):
-    bot.send_message(ctx.message.channel,'squidward.jpg')
+    bot.send_file(ctx.message.channel,'squidward.jpg')
 @bot.command()
 async def help():
     await bot.say(embed=embed)
