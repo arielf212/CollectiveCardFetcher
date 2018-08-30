@@ -22,6 +22,8 @@ embed.add_field(name = '!good' , value = 'Ups the score of the bot. Will make th
 embed.add_field(name = '!bad', value = 'Reduces the score of the bot. Will make the bot respond with an apologetic message.')
 embed.add_field(name = '!score' , value = 'the bot will respond with the amount of votes given to him trough !bad and !good')
 embed.add_field(name = '!new', value = 'needs to be used with one of the following topics after: incubation, turns, keywords, collection, links, heroes or restrictions. will return an explanation about said topic')
+embed.add_field(name = '!squidward' , value = 'the bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
+embed.add_field(name = '!excuseme' , value = 'responds with the classic meme of "excuse me wtf".')
 bot.remove_command('help')
 
 # functions
@@ -245,6 +247,10 @@ async def image(ctx,link):
 @bot.command(pass_context=True)
 async def squidward(ctx):
     await bot.send_file(ctx.message.channel,'squidward.jpg')
+
+@bot.command(pass_context=True)
+async def excuseme(ctx):
+    await bot.send_message(ctx.message.channel,'excuseme.jpg')
 
 @bot.command()
 async def help():
