@@ -250,7 +250,7 @@ async def squidward(ctx):
 
 @bot.command(pass_context=True)
 async def excuseme(ctx):
-    await bot.send_message(ctx.message.channel,'excuseme.jpg')
+    await bot.send_file(ctx.message.channel,'excuseme.jpg')
 
 @bot.command()
 async def help():
