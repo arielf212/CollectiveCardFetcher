@@ -228,6 +228,7 @@ async def say(ctx):
 
 @bot.command(pass_context=True)
 async def update(ctx):
+    global core_set
     if ctx.message.author.id == '223876086994436097':
         core_set = {}
         for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
