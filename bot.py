@@ -230,9 +230,9 @@ async def say(ctx):
 async def update(ctx):
     if ctx.message.author.id == '223876086994436097':
         core_set = {}
-        for card_info in requests.get('https://server.collective.gg/api/public-cards/').json():
+        for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
             if card_info['imgurl'] is not None:
-                core_set['name'] = card_info['imgurl']
+                core_set[card_info['name']] = card_info['imgurl']
         bot.say('done updating the cards!')
 
 @bot.command(pass_context=True)
