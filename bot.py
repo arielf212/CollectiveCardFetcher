@@ -227,6 +227,15 @@ async def say(ctx):
         await bot.say(' '.join(ctx.message.content.split(' ')[1:]))
 
 @bot.command(pass_context=True)
+async def update(ctx):
+    if ctx.message.author.id == '223876086994436097':
+        core_set = {}
+        for card_info in requests.get('https://server.collective.gg/api/public-cards/').json():
+            if card_info['imgurl'] is not None:
+                core_set['name'] = card_info['imgurl']
+        bot.say('done updating the cards!')
+
+@bot.command(pass_context=True)
 async def image(ctx,link):
     if link.startswith('https://files.collective.gg/p/cards/'):
         card_id = '-'.join(link.split('/')[-1].split('-')[ :-1])
