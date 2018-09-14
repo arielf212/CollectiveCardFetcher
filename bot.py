@@ -233,7 +233,7 @@ async def update(ctx):
         for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
             if card_info['imgurl'] is not None:
                 core_set[card_info['name']] = card_info['imgurl']
-        bot.say('done updating the cards!')
+        await bot.say('done updating the cards!')
 
 @bot.command(pass_context=True)
 async def image(ctx,link):
