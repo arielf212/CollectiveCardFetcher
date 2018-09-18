@@ -40,7 +40,7 @@ def get_card_name(text):
             if query.find(':') > 0:
                 mod = query[:query.find(':')].lower()
                 card = query[query.find(':')+1:]
-                if mod not in ['mtg','core','sb']:
+                if mod not in ['mtg','core','sb','ygo']:
                     card = query
                     mod = 'none'
                 cards.append((mod,card))
@@ -59,11 +59,9 @@ def save_card(name , link):
 def load_core_set():
     '''loads the core set cards from core_set.csv into a dictionary called core_set'''
     core_set = {}
-    with open('core_set.csv' , 'r') as core_set_file:
-        core_set_csv = csv.reader(core_set_file , delimiter = ',')
-        for row in core_set_csv:
-            name , link = row # unpack the row into a name and a link
-            core_set[name] = link # adds the card into the core_set dictionary
+    for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
+        if card_info['imgurl'] is not None:
+            core_set[card_info['name']] = card_info['imgurl']
     return core_set
 
 def load_temp_cards():
@@ -127,7 +125,7 @@ def get_link(card):
     return search_list[max_ratio[0]]
 
 def get_mtg(card):
-    '''sends an image file of the mtg card'''
+    '''sends a link to an image file of the mtg card'''
     # check scryfall api at scryfall website
     available = requests.get('https://api.scryfall.com/cards/named/', {'fuzzy': card}).json()
     if available['object'] == 'card':
@@ -154,6 +152,13 @@ def get_stormbound(card):
     if max_partial[1] > max_ratio[1]:
         return stormbound_cards[max_partial[0]]
     return stormbound_cards[max_ratio[0]]
+
+def get_ygo(card):
+    id = requests.get('https://db.ygoprodeck.com/similarcards2.php?name=' + 'card shuffle').text[2:-2]
+    if id:
+        return 'https://ygoprodeck.com/pics/'+id.split(',')[0].split(':')[1]+'.jpg'
+    else:
+        return '{} was not found. please be more specific'.format(card)
 
 def get_top(num , week):
     return_list = []
