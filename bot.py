@@ -154,7 +154,7 @@ def get_stormbound(card):
     return stormbound_cards[max_ratio[0]]
 
 def get_ygo(card):
-    id = requests.get('https://db.ygoprodeck.com/similarcards2.php?name=' + 'card shuffle').text[2:-2]
+    id = requests.get('https://db.ygoprodeck.com/similarcards2.php?name=' + card).text[2:-2]
     if id:
         return 'https://ygoprodeck.com/pics/'+id.split(',')[0].split(':')[1][1:-1]+'.jpg'
     else:
