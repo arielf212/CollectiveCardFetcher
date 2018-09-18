@@ -302,6 +302,8 @@ async def on_message(message):
                 links.append(get_mtg(card))
             elif mod == 'sb':
                 links.append(get_stormbound(card))
+            elif mod == 'ygo':
+                links.append(get_ygo(card))
     if links: # if there are any links
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
