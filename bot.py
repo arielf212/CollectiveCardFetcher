@@ -24,6 +24,7 @@ embed.add_field(name = '!score' , value = 'the bot will respond with the amount 
 embed.add_field(name = '!new', value = 'needs to be used with one of the following topics after: incubation, turns, keywords, collection, links, heroes, restrictions or affinities. will return an explanation about said topic')
 embed.add_field(name = '!squidward' , value = 'the bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
 embed.add_field(name = '!excuseme' , value = 'responds with the classic meme of "excuse me wtf".')
+embed.add_field(name = '!leaderboard', value = 'responds with an embed holding the value of the current leaderboard')
 bot.remove_command('help')
 
 # functions
@@ -173,6 +174,70 @@ def get_top(num , week):
             index+=1
     return return_list
 
+def create_csv_func():
+    '''this function is for the command sharing the same name'''
+    cards = requests.get('https://server.collective.gg/api/public-cards/').json()['cards']
+    with open('collective_created_csv.csv', 'w+', newline='') as foutput:
+        output = csv.writer(foutput)
+        output.writerow(
+            ['Needs Update', 'Name', 'Links', 'Full Text', 'type', 'cost', 'ATK', 'HP', 'Affinity', 'Tribe',
+             'Rarity', 'Ticks', 'Week/DC', 'Author', 'Artist'])
+        for card_info in cards:
+            card = requests.get('https://server.collective.gg/api/card/' + card_info['uid']).json()
+            attr = card['card']
+            name = attr['Text']['Name']
+            text = ''
+            keywords = []
+            for ability in card['card']['Text']['Abilities']:
+                if '$type' in ability.keys() and len(ability) == 1:
+                    keywords.append(ability['$type'].split('.')[1])
+                else:
+                    for property in ability['Properties']:
+                        if property['Expression']['$type'] == 'StringLiteral':
+                            text += property['Expression']['Value']
+            summon = ''
+            if card['card']['Text']['PlayAbility'].get('Properties') is not None:
+                for property in card['card']['Text']['PlayAbility']['Properties']:
+                    if property['Symbol']['Name'] == 'AbilityText':
+                        summon = property['Expression']['Value']
+            text = ','.join(keywords) + ' ' + summon + ' ' + text
+            type = attr['Text']['ObjectType']
+            ATK = ''
+            HP = ''
+            tribe = ''
+            creator = ''
+            artist = ''
+            for property in attr['Text']['Properties']:
+                if property['Symbol']['Name'] == 'IGOCost':
+                    cost = property['Expression']['Value']
+                elif property['Symbol']['Name'] == 'ATK':
+                    ATK = property['Expression']['Value']
+                elif property['Symbol']['Name'] == 'HP':
+                    HP = property['Expression']['Value']
+                elif property['Symbol']['Name'] == 'TribalType':
+                    tribe = property['Expression']['Value']
+                elif property['Symbol']['Name'] == 'CreatorName':
+                    creator = property['Expression']['Value']
+                elif property['Symbol']['Name'] == 'ArtistName':
+                    artist = property['Expression']['Value']
+            affinity = attr['Text']['Affinity']
+            if affinity == 'None':
+                affinity = 'Neutral'
+            rarity = attr['Text']['Rarity']
+            if attr['Text'].get('AntifinityPenalty') is None:
+                ticks = ''
+            else:
+                ticks = attr['Text']['AntifinityPenalty'] if affinity != 'Neutral' else ''
+            if attr['Text'].get('AffinityExclusive') != True and attr['Text'].get('AffinityExclusive') is not None:
+                ticks = 'Exclusive'
+            if card_info['releasegroup'] is None:
+                week = '0'
+            else:
+                week = card_info['releasegroup']
+            output.writerow(
+                ['', name, card_info['imgurl'], text, type, cost, ATK, HP, affinity, tribe, rarity, ticks, week,
+                 creator, artist])
+
 # commands
 @bot.command()
 async def alive():
@@ -269,6 +334,18 @@ async def squidward(ctx):
 async def excuseme(ctx):
     await bot.send_file(ctx.message.channel,'excuseme.jpg')
 
+@bot.command()
+async def create_csv():
+    await bot.say('Done with making a spreadsheet!')
+    await bot.send_file('collective_created_csv.csv')
+
+@bot.command()
+async def leaderboard():
+    leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
+    leaderboard.add_field(name = 'Rank Username Rating Hero', value = '1')
+    for spot in requests.get('https://server.collective.gg/api/public/leaderboards').json()['multi']:
+        leaderboard.add_field(name='{}) {} {} {}'.format(spot['deck_rank'],spot['username'],spot['elo'],spot['hero_name']),value=(spot['deck_rank'])+1,inline=False)
+    await bot.say(embed=leaderboard)
 @bot.command()
 async def help():
     await bot.say(embed=embed)
