@@ -40,7 +40,7 @@ def get_card_name(text):
             if query.find(':') > 0:
                 mod = query[:query.find(':')].lower()
                 card = query[query.find(':')+1:]
-                if mod not in ['mtg','core','sb','ygo']:
+                if mod not in POSSIBLE_MODS:
                     card = query
                     mod = 'none'
                 cards.append((mod,card))
@@ -98,7 +98,7 @@ async def repost_card(post_channel):
             await bot.send_message(post_channel , card)
         await asyncio.sleep(10)
 
-def get_link(card):
+def get_core(card):
     max_ratio = (' ', 0)  # maximum score in ratio exam
     max_partial = (' ', 0)  # maximum sort in partial ratio exam
     list_ratio = []
@@ -281,31 +281,34 @@ async def on_message(message):
     for card in cards:
         mod , card = card
         if card.lower().startswith('top '):
+            card = card.lower()
             if len(card.split(' ')) == 2: # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 if num.isdigit():
                     links += get_top(int(num) , os.environ.get('WEEK'))
-            elif len(card.split(' ')) == 4 and card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
-                num = card.split(' ')[1]
-                week = card.split(' ')[3]
-                if num.isdigit() and week.isdigit():
-                    links += get_top(int(num) , int(week))
+            elif len(card.split(' ')) == 4:
+                if card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
+                    num = card.split(' ')[1]
+                    week = card.split(' ')[3]
+                    if num.isdigit() and week.isdigit():
+                        links += get_top(int(num) , int(week))
+                elif card.split(' ')[2] == 'dc':
+                    links += list([x.url for x in collective.search('[DC{}'.format(week),sort='top',limit=num)])
         else:
-            if mod == 'none' or mod == 'core':
-                found = False
-                if mod == 'none':
-                    for post in collective.search(card , limit = 1): # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
-                        if post.title.startswith('['):
-                            links.append(post.url)
-                            found = True
-                if not found: # if we didn't find any cards that go by that name
-                    links.append(get_link(card))
+            if mod == 'none':
+                links.append(get_core(card))
+            elif mod == 'sub':
+                for post in collective.search(card, limit=1):  # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
+                    if post.title.startswith('['):
+                        links.append(post.url)
             elif mod == 'mtg':
                 links.append(get_mtg(card))
             elif mod == 'sb':
                 links.append(get_stormbound(card))
             elif mod == 'ygo':
                 links.append(get_ygo(card))
+            else:
+                links.append("the mode you chose is not present at this moment. current mods are: {}".format(','.join(POSSIBLE_MODS)))
     if links: # if there are any links
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
@@ -315,4 +318,5 @@ async def on_message(message):
 core_set = load_core_set()
 temp_cards = load_temp_cards()
 stormbound_cards = load_stormbound_cards()
+POSSIBLE_MODS = ['mtg','sub','sb','ygo']
 bot.run(os.environ.get('BOT_TOKEN'))
