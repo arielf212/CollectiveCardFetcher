@@ -293,7 +293,7 @@ async def on_message(message):
                     if num.isdigit() and week.isdigit():
                         links += get_top(int(num) , int(week))
                 elif card.split(' ')[2] == 'dc':
-                    links += list([x.url for x in collective.search('[DC{}'.format(str(week)),sort='top',limit=num)])
+                    links += list([x.url for x in filter(lambda post: not post.selftext ,collective.search('[DC{}'.format(week),sort='top',limit=int(num)))])
         else:
             if mod == 'none':
                 links.append(get_core(card))
@@ -319,4 +319,4 @@ core_set = load_core_set()
 temp_cards = load_temp_cards()
 stormbound_cards = load_stormbound_cards()
 POSSIBLE_MODS = ['mtg','sub','sb','ygo']
-bot.run(os.environ.get('BOT_TOKEN'))
+bot.run(os.environ.get('BOT_TOKEN')) #DO NOT FORGET TO REMOVE
