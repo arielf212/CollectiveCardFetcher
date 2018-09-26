@@ -287,9 +287,9 @@ async def on_message(message):
                 if num.isdigit():
                     links += get_top(int(num) , os.environ.get('WEEK'))
             elif len(card.split(' ')) == 4:
+                num = card.split(' ')[1]
+                week = card.split(' ')[3]
                 if card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
-                    num = card.split(' ')[1]
-                    week = card.split(' ')[3]
                     if num.isdigit() and week.isdigit():
                         links += get_top(int(num) , int(week))
                 elif card.split(' ')[2] == 'dc':
