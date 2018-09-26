@@ -293,7 +293,7 @@ async def on_message(message):
                     if num.isdigit() and week.isdigit():
                         links += get_top(int(num) , int(week))
                 elif card.split(' ')[2] == 'dc':
-                    links += list([x.url for x in collective.search('[DC{}'.format(week),sort='top',limit=num)])
+                    links += list([x.url for x in collective.search('[DC{}'.format(str(week)),sort='top',limit=num)])
         else:
             if mod == 'none':
                 links.append(get_core(card))
