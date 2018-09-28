@@ -342,7 +342,6 @@ async def create_csv():
 @bot.command()
 async def leaderboard():
     leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
-    leaderboard.add_field(name = 'Rank Username Rating Hero', value = '1')
     for spot in requests.get('https://server.collective.gg/api/public/leaderboards').json()['multi']:
         leaderboard.add_field(name='{}) {} {} {}'.format(spot['deck_rank'],spot['username'],spot['elo'],spot['hero_name']),value=(spot['deck_rank'])+1,inline=False)
     await bot.say(embed=leaderboard)
