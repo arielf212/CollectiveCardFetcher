@@ -88,7 +88,7 @@ def load_stormbound_cards():
 
 def load_eternal():
     cards = {}
-    with open('eternal_list' , 'r') as fcard_list:
+    with open('eternal_list.csv' , 'r') as fcard_list:
         card_list = csv.reader(fcard_list , delimiter = ',')
         for row in card_list:
             name , link = row
