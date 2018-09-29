@@ -20,11 +20,12 @@ embed.add_field(name = '!github', value = "The bot will respond with a link to t
 embed.add_field(name = '!nice' , value = 'The bot will respond with a "nice art!" picture.')
 embed.add_field(name = '!good' , value = 'Ups the score of the bot. Will make the bot respond with a thankful message.')
 embed.add_field(name = '!bad', value = 'Reduces the score of the bot. Will make the bot respond with an apologetic message.')
-embed.add_field(name = '!score' , value = 'the bot will respond with the amount of votes given to him trough !bad and !good')
-embed.add_field(name = '!new', value = 'needs to be used with one of the following topics after: incubation, turns, keywords, collection, links, heroes, restrictions or affinities. will return an explanation about said topic')
-embed.add_field(name = '!squidward' , value = 'the bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
-embed.add_field(name = '!excuseme' , value = 'responds with the classic meme of "excuse me wtf".')
-embed.add_field(name = '!leaderboard', value = 'responds with an embed holding the value of the current leaderboard')
+embed.add_field(name = '!score' , value = 'The bot will respond with the amount of votes given to him trough !bad and !good')
+embed.add_field(name = '!image <link>' , value= 'Will return the art of the card linked.')
+embed.add_field(name = '!new', value = 'Needs to be used with one of the following topics after: incubation, turns, keywords, collection, links, heroes, restrictions, affinities or basics. will return an explanation about said topic')
+embed.add_field(name = '!squidward' , value = 'The bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
+embed.add_field(name = '!excuseme' , value = 'Responds with the classic meme of "excuse me wtf".')
+embed.add_field(name = '!leaderboard', value = 'Responds with an embed holding the value of the current leaderboard.')
 bot.remove_command('help')
 
 # functions
@@ -162,81 +163,13 @@ def get_ygo(card):
         return '{} was not found. please be more specific'.format(card)
 
 def get_top(num , week):
-    return_list = []
-    index = 1
-    while index <= num:
-        post = list(collective.search('flair:(week ' + str(week) + ')',limit = index , sort = 'top'))[-1]
-        if post.title.startswith('[Card') or post.title.startswith('[Update'):
-            return_list.append(post.url)
-            index+=1
-        else:
-            num+=1
-            index+=1
-    return return_list
-
-def create_csv_func():
-    '''this function is for the command sharing the same name'''
-    cards = requests.get('https://server.collective.gg/api/public-cards/').json()['cards']
-    with open('collective_created_csv.csv', 'w+', newline='') as foutput:
-        output = csv.writer(foutput)
-        output.writerow(
-            ['Needs Update', 'Name', 'Links', 'Full Text', 'type', 'cost', 'ATK', 'HP', 'Affinity', 'Tribe',
-             'Rarity', 'Ticks', 'Week/DC', 'Author', 'Artist'])
-        for card_info in cards:
-            card = requests.get('https://server.collective.gg/api/card/' + card_info['uid']).json()
-            attr = card['card']
-            name = attr['Text']['Name']
-            text = ''
-            keywords = []
-            for ability in card['card']['Text']['Abilities']:
-                if '$type' in ability.keys() and len(ability) == 1:
-                    keywords.append(ability['$type'].split('.')[1])
-                else:
-                    for property in ability['Properties']:
-                        if property['Expression']['$type'] == 'StringLiteral':
-                            text += property['Expression']['Value']
-            summon = ''
-            if card['card']['Text']['PlayAbility'].get('Properties') is not None:
-                for property in card['card']['Text']['PlayAbility']['Properties']:
-                    if property['Symbol']['Name'] == 'AbilityText':
-                        summon = property['Expression']['Value']
-            text = ','.join(keywords) + ' ' + summon + ' ' + text
-            type = attr['Text']['ObjectType']
-            ATK = ''
-            HP = ''
-            tribe = ''
-            creator = ''
-            artist = ''
-            for property in attr['Text']['Properties']:
-                if property['Symbol']['Name'] == 'IGOCost':
-                    cost = property['Expression']['Value']
-                elif property['Symbol']['Name'] == 'ATK':
-                    ATK = property['Expression']['Value']
-                elif property['Symbol']['Name'] == 'HP':
-                    HP = property['Expression']['Value']
-                elif property['Symbol']['Name'] == 'TribalType':
-                    tribe = property['Expression']['Value']
-                elif property['Symbol']['Name'] == 'CreatorName':
-                    creator = property['Expression']['Value']
-                elif property['Symbol']['Name'] == 'ArtistName':
-                    artist = property['Expression']['Value']
-            affinity = attr['Text']['Affinity']
-            if affinity == 'None':
-                affinity = 'Neutral'
-            rarity = attr['Text']['Rarity']
-            if attr['Text'].get('AntifinityPenalty') is None:
-                ticks = ''
-            else:
-                ticks = attr['Text']['AntifinityPenalty'] if affinity != 'Neutral' else ''
-            if attr['Text'].get('AffinityExclusive') != True and attr['Text'].get('AffinityExclusive') is not None:
-                ticks = 'Exclusive'
-            if card_info['releasegroup'] is None:
-                week = '0'
-            else:
-                week = card_info['releasegroup']
-            output.writerow(
-                ['', name, card_info['imgurl'], text, type, cost, ATK, HP, affinity, tribe, rarity, ticks, week,
-                 creator, artist])
+    ret = []
+    count = 0
+    for post in collective.search('flair:(week ' + week + ')',limit = 1000, sort = 'top'):
+        if (post.title.lower().startswith('[card') or post.title.lower().startswith('[update')) and count<num:
+            ret.append(post.url+' | '+str(post.score)+' | '+str(int(post.upvote_ratio*100))+'%')
+            count+=1
+    return ret
 
 # commands
 @bot.command()
@@ -289,8 +222,10 @@ async def new(link):
         await bot.say('Temporary rules based on current game restrictions\n\nTribal types right now are exact, so a “Feowyn Mutant” would not count as a Feowyn for example. We’re going to change this later, so as long as your tribal type doesn’t affect the game rules, feel free to put whatever you want for flavor.\n\nMechanics people have asked about but we haven’t implemented yet:\n\nRevealing hidden cards (looking at an opponent’s hand or the top of their deck). Because you can’t reveal cards in this way, you also can’t select a card from a set of revealed cards. So no “look at your opponent’s hand and discard one of those cards” effects\n\nSelecting cards from your own hand. No effects like “draw two cards, then choose and discard two cards from your hand.” You can do this right now but only if they are chosen randomly.\n\nCards with multiple targets. No cards like “One of your units deals its power in damage to another unit,” because you’d have to select your unit and the opponent’s unit\n\nTriggered abilities where you make decisions ("modes"). Also, no effects like “when an opponent draws a card, deal 1 damage to one of their units” because it requires you to choose what to deal damage to mid-turn. Again, this is fine if it’s chosen randomly\n\nManually triggering “hook” abilities like summon, entomb is not possible yet\n\nReplacement effects\n\nNo effects like “if you would draw a card, instead discard a card”\n\nNo effects like “if you would take damage, instead you…” (Including “instead nothing happens”)\n\nChange of control effects ("gain control of a unit" or "move a unit from your opponent\'s discard to your in play")\n\nTargets in any zone other than in play ("move a card from your discard to your hand" won\'t let you choose, you have to choose it randomly for now)')
     elif link == 'affinities':
         await bot.say('https://collective.gamepedia.com/Affinity_Identities')
+    elif link == 'basics':
+        await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 12 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
     else:
-        await bot.say("{} isnt a link I can give. the current links are: incubation,collection,keywords,turns,links,heroes,restrictions,affinities".format(link))
+        await bot.say("{} isnt a link I can give. the current links are: incubation,collection,keywords,turns,links,heroes,restrictions,affinities,basics".format(link))
 
 @bot.command(pass_context=True)
 async def say(ctx):
@@ -335,11 +270,6 @@ async def excuseme(ctx):
     await bot.send_file(ctx.message.channel,'excuseme.jpg')
 
 @bot.command()
-async def create_csv():
-    await bot.say('Done with making a spreadsheet!')
-    await bot.send_file('collective_created_csv.csv')
-
-@bot.command()
 async def leaderboard():
     leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
     for spot in requests.get('https://server.collective.gg/api/public/leaderboards').json()['multi']:
@@ -361,13 +291,13 @@ async def on_message(message):
             if len(card.split(' ')) == 2: # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 if num.isdigit():
-                    links += get_top(int(num) , os.environ.get('WEEK'))
+                    links += get_top(int(num),os.environ.get('WEEK'))
             elif len(card.split(' ')) == 4:
                 num = card.split(' ')[1]
                 week = card.split(' ')[3]
                 if card.split(' ')[2] == 'week': # the name looks like this: "top X week Y"
                     if num.isdigit() and week.isdigit():
-                        links += get_top(int(num) , int(week))
+                        links += get_top(int(num), week)
                 elif card.split(' ')[2] == 'dc':
                     links += list([x.url for x in filter(lambda post: not post.selftext ,collective.search('[DC{}'.format(week),sort='top',limit=int(num)))])
         else:
@@ -389,6 +319,11 @@ async def on_message(message):
         for x in range((len(links)//5)+1): # this loops runs one time plus once for every five links since discord can only display five pictures per message
             await bot.send_message(message.channel , '\n'.join(links[5*x:5*(x+1)]))
     await bot.process_commands(message)
+
+@bot.event
+async def on_reaction_add(reaction,user):
+    if reaction.emoji == '🤦' and reaction.message.author == bot.user:
+        await bot.delete_message(reaction.message)
 
 #main
 core_set = load_core_set()
