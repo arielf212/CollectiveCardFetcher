@@ -86,6 +86,15 @@ def load_stormbound_cards():
             cards[name] = link
     return cards
 
+def load_eternal():
+    cards = {}
+    with open('eternal_list' , 'r') as fcard_list:
+        card_list = csv.reader(fcard_list , delimiter = ',')
+        for row in card_list:
+            name , link = row
+            cards[name] = link
+    return cards
+
 def get_card():
     '''fetches the newest card from reddit'''
     for card in collective.new(limit = 1):
@@ -154,6 +163,27 @@ def get_stormbound(card):
     if max_partial[1] > max_ratio[1]:
         return stormbound_cards[max_partial[0]]
     return stormbound_cards[max_ratio[0]]
+
+def get_eternal(card):
+    max_ratio = (' ', 0)  # maximum score in ratio exam
+    max_partial = (' ', 0)  # maximum sort in partial ratio exam
+    for entry in eternal_cards:
+        # lets check if an entry is "good enough" to be our card
+        ratio = fuzz.ratio(card, entry)
+        partial = fuzz.partial_ratio(card, entry)
+        if ratio > max_ratio[1]:
+            max_ratio = (entry, ratio)
+            list_ratio = [max_ratio]
+        elif ratio == max_ratio[1]:
+            list_ratio.append((entry, ratio))
+        if partial > max_partial[1]:
+            max_partial = (entry, partial)
+            list_partial = [max_partial]
+        elif partial == max_partial[1]:
+            list_partial.append((entry, partial))
+    if max_partial[1] > max_ratio[1]:
+        return eternal_cards[max_partial[0]]
+    return eternal_cards[max_ratio[0]]
 
 def get_ygo(card):
     id = requests.get('https://db.ygoprodeck.com/similarcards2.php?name=' + card).text[2:-2]
@@ -313,6 +343,8 @@ async def on_message(message):
                 links.append(get_stormbound(card))
             elif mod == 'ygo':
                 links.append(get_ygo(card))
+            elif mod == 'eternal':
+                links.append(get_eternal(card))
             else:
                 links.append("the mode you chose is not present at this moment. current mods are: {}".format(','.join(POSSIBLE_MODS)))
     if links: # if there are any links
@@ -329,5 +361,6 @@ async def on_reaction_add(reaction,user):
 core_set = load_core_set()
 temp_cards = load_temp_cards()
 stormbound_cards = load_stormbound_cards()
-POSSIBLE_MODS = ['mtg','sub','sb','ygo']
+eternal_cards = load_eternal()
+POSSIBLE_MODS = ['mtg','sub','sb','ygo','eternal']
 bot.run(os.environ.get('BOT_TOKEN')) #DO NOT FORGET TO REMOVE
