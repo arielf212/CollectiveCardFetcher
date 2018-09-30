@@ -253,7 +253,7 @@ async def new(link):
     elif link == 'affinities':
         await bot.say('https://collective.gamepedia.com/Affinity_Identities')
     elif link == 'basics':
-        await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 12 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
+        await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 13 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
     else:
         await bot.say("{} isnt a link I can give. the current links are: keys,collection,keywords,turns,links,heroes,restrictions,affinities,basics".format(link))
 
@@ -334,9 +334,13 @@ async def on_message(message):
             if mod == 'none':
                 links.append(get_core(card))
             elif mod == 'sub':
+                found = False
                 for post in collective.search(card, limit=1):  # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
                     if post.title.startswith('['):
                         links.append(post.url)
+                        found = True
+                if not found:
+                    links.append('{} was not found in the subreddit.'.format(card))
             elif mod == 'mtg':
                 links.append(get_mtg(card))
             elif mod == 'sb':
