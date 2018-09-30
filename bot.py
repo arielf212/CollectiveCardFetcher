@@ -22,7 +22,7 @@ embed.add_field(name = '!good' , value = 'Ups the score of the bot. Will make th
 embed.add_field(name = '!bad', value = 'Reduces the score of the bot. Will make the bot respond with an apologetic message.')
 embed.add_field(name = '!score' , value = 'The bot will respond with the amount of votes given to him trough !bad and !good')
 embed.add_field(name = '!image <link>' , value= 'Will return the art of the card linked.')
-embed.add_field(name = '!new', value = 'Needs to be used with one of the following topics after: incubation, turns, keywords, collection, links, heroes, restrictions, affinities or basics. will return an explanation about said topic')
+embed.add_field(name = '!new', value = 'Needs to be used with one of the following topics after: keys, turns, keywords, collection, links, heroes, restrictions, affinities or basics. will return an explanation about said topic')
 embed.add_field(name = '!squidward' , value = 'The bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
 embed.add_field(name = '!excuseme' , value = 'Responds with the classic meme of "excuse me wtf".')
 embed.add_field(name = '!leaderboard', value = 'Responds with an embed holding the value of the current leaderboard.')
@@ -235,8 +235,8 @@ async def score():
 
 @bot.command()
 async def new(link):
-    if link == 'incubation':
-        await bot.say("We are in incubation mode right now, which means that no new alpha keys are being given out while the devs are working on new features for the game. If you don't have a key, which is required to access the editor and create cards, you can still submit cards by proxy via the Editor Workshop channels ( #card-lab-🔬 for design, #art-sharing  for art, #editor-help  for programming). Many of our members would be happy to help you out there. Keep an eye out for opportunities for keys, as we occasionally host competitions that allow new players to receive a key if they join.")
+    if link == 'keys':
+        await bot.say("Invite keys aren’t being given out currently, as the devs work on new player features. They will be available freely again in around 2 months’ time.\nIn the meantime, we have occasional Team Design Competitions. By participating (not winning) via teaming up with another player, you can get into the game. If you’d like, you can be put on a reminder list for if/when the next one happens.")
     elif link == 'collection':
         await bot.say("https://www.collective.gg/collection")
     elif link == 'keywords':
@@ -255,7 +255,7 @@ async def new(link):
     elif link == 'basics':
         await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 12 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
     else:
-        await bot.say("{} isnt a link I can give. the current links are: incubation,collection,keywords,turns,links,heroes,restrictions,affinities,basics".format(link))
+        await bot.say("{} isnt a link I can give. the current links are: keys,collection,keywords,turns,links,heroes,restrictions,affinities,basics".format(link))
 
 @bot.command(pass_context=True)
 async def say(ctx):
