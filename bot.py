@@ -235,7 +235,7 @@ async def new(link):
     elif link == 'basics':
         await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 13 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
     elif link == 'player':
-        await bot.say('**Helpful Links**\nList of cards: <https://www.collective.gg/collection>\nList of keywords: <https://collective.gamepedia.com/Keywords>\nWrite-up of affinity identity trends: <https://collective.gamepedia.com/Affinity_Identities>\nList of current coding restraints: <https://collective.gamepedia.com/Temporary_rules>\nArticle on player design strategies: <https://medium.com/@nick#9853_13012/design-strategies-for-ccgs-that-our-players-taught-us-6f8585613f52>\n\n**Helpful Commands (add ! in front of the commands, use in #card-fetcher-spam )**\n!new basics (some foundational traits of the game)\n!new turns (explanation of the simultaneous turns system)\n!new heroes (explanation of the heroes and XP system)')
+        await bot.say('**Helpful Links**\nList of cards: <https://www.collective.gg/collection>\nList of keywords: <https://collective.gamepedia.com/Keywords>\nWrite-up of affinity identity trends: <https://collective.gamepedia.com/Affinity_Identities>\nList of current coding restraints: <https://collective.gamepedia.com/Temporary_rules>\nArticle on player design strategies: <https://medium.com/@nick#9853_13012/design-strategies-for-ccgs-that-our-players-taught-us-6f8585613f52>\n\n**Helpful Commands**\n!new basics (some foundational traits of the game)\n!new turns (explanation of the simultaneous turns system)\n!new heroes (explanation of the heroes and XP system)')
     else:
         await bot.say("{} isnt a link I can give. the current links are: keys,collection,turns,heroes,basics,player".format(link))
 
@@ -331,8 +331,6 @@ async def on_message(message):
                 links.append(get_ygo(card))
             elif mod == 'et':
                 links.append(get_from_set(card,eternal_cards))
-            elif mod == 'hs':
-                links.append(get_from_set(card,hs_cards))
             elif mod == 'hs':
                 links.append('https://art.hearthstonejson.com/v1/render/latest/enUS/512x/'+get_from_set(card,hs_cards)+'.png')
             else:
