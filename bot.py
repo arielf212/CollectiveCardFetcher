@@ -100,9 +100,9 @@ def load_hs():
     card_data = requests.get('https://api.hearthstonejson.com/v1/25770/enUS/cards.json').json()
     for card in card_data:
         if 'name' not in card:
-        continue
+            continue
         cards[card['name']] = card['id']
-    return card_data
+    return cards
 
 def get_card():
     '''fetches the newest card from reddit'''
