@@ -95,6 +95,15 @@ def load_eternal():
             cards[name] = link
     return cards
 
+def load_hs():
+    cards = {}
+    card_data = requests.get('https://api.hearthstonejson.com/v1/25770/enUS/cards.json').json()
+    for card in card_data:
+        if 'name' not in card:
+        continue
+        cards[card['name']] = card['id']
+    return card_data
+
 def get_card():
     '''fetches the newest card from reddit'''
     for card in collective.new(limit = 1):
@@ -143,10 +152,10 @@ def get_mtg(card):
         return 'https://api.scryfall.com/cards/named?fuzzy={};format=image;version=png'.format(card.replace(' ', '%20'))
     return "sorry, couldn't find {}. please try again.".format(card)
 
-def get_stormbound(card):
+def get_from_set(card,set):
     max_ratio = (' ', 0)  # maximum score in ratio exam
     max_partial = (' ', 0)  # maximum sort in partial ratio exam
-    for entry in stormbound_cards:
+    for entry in set:
         # lets check if an entry is "good enough" to be our card
         ratio = fuzz.ratio(card, entry)
         partial = fuzz.partial_ratio(card, entry)
@@ -161,29 +170,8 @@ def get_stormbound(card):
         elif partial == max_partial[1]:
             list_partial.append((entry, partial))
     if max_partial[1] > max_ratio[1]:
-        return stormbound_cards[max_partial[0]]
-    return stormbound_cards[max_ratio[0]]
-
-def get_eternal(card):
-    max_ratio = (' ', 0)  # maximum score in ratio exam
-    max_partial = (' ', 0)  # maximum sort in partial ratio exam
-    for entry in eternal_cards:
-        # lets check if an entry is "good enough" to be our card
-        ratio = fuzz.ratio(card, entry)
-        partial = fuzz.partial_ratio(card, entry)
-        if ratio > max_ratio[1]:
-            max_ratio = (entry, ratio)
-            list_ratio = [max_ratio]
-        elif ratio == max_ratio[1]:
-            list_ratio.append((entry, ratio))
-        if partial > max_partial[1]:
-            max_partial = (entry, partial)
-            list_partial = [max_partial]
-        elif partial == max_partial[1]:
-            list_partial.append((entry, partial))
-    if max_partial[1] > max_ratio[1]:
-        return eternal_cards[max_partial[0]]
-    return eternal_cards[max_ratio[0]]
+        return set[max_partial[0]]
+    return set[max_ratio[0]]
 
 def get_ygo(card):
     id = requests.get('https://db.ygoprodeck.com/similarcards2.php?name=' + card).text[2:-2]
@@ -239,23 +227,17 @@ async def new(link):
         await bot.say("Invite keys aren’t being given out currently, as the devs work on new player features. They will be available freely again in around 2 months’ time.\nIn the meantime, we have occasional Team Design Competitions. By participating (not winning) via teaming up with another player, you can get into the game. If you’d like, you can be put on a reminder list for if/when the next one happens.")
     elif link == 'collection':
         await bot.say("https://www.collective.gg/collection")
-    elif link == 'keywords':
-        await bot.say('https://collective.gamepedia.com/Keywords')
     elif link == 'turns':
         await bot.say("Each turn has two main phases. They are first the card/abilities phase, then the attack/block phase. At start of turn, each player first draws 1 card and gains 1 EXP.\n\nDuring the first phase, a player is assigned initiative, which alternates between players each turn. Players simultaneously play their cards and activate unit abilities (actives). Their decisions don't happen immediately, but go on a stack where they wait to be resolved, until both players finished making their choices. Then, starting with the player with initiative, all cards/abilities are resolved in the order they were selected in. After all of the effects of the cards/abilities of the initiative player resolves, then all of the non-initiative player's actions resolve. That ends the first phase.\n\nDuring the second phase, players again make simultaneous decisions that don't take effect until both have confirmed their choices. Attackers are selected first. After those choices are locked in, then defenders are selected. After defenders are locked in, combat happens. The initiative player's attackers deal their atk to their respective blockers' hp, or to the opponent's hp if unblocked. The attack value of a unit is dealt cumulatively to each defender, not the same amount to each. If an 1/2 attacker is blocked with two 1/1s, only one of the 1/1s will die. The order in which you select blocks is the order in which units block. This can lead to situations where a 1/2 is blocked with a vanilla 0/3 and a 1/1 deadly, and the deadly unit will kill the 1/2 without taking damage, because it was selected it to block second.")
-    elif link == 'links':
-        await bot.say("List of cards: https://www.collective.gg/collection\nList of keywords: https://collective.gamepedia.com/Keywords")
     elif link == 'heroes':
         await bot.say('Collective is unique in utilizing Heroes and the EXP system as an integral part of gameplay. When you build a new deck, you do so under a hero of your choice, with that deck being bound to the hero and unable to be played with any other.  Heroes aren\'t actual units or cards, but act as a reward system through which you can receive a free unit on board, a spell in hand, or a passive ability that lasts for the duration of the game. Each hero (of which the game currently has four, with more planned) has 4 different rewards specific to them, provided sequentially when they "level up". Leveling up happens as certain EXP thresholds are reached within each match, which are reset once the match concludes, with the exact thresholds differing for each hero. EXP is attainable through three ways: One, at the beginning of each turn, each player gains 1 EXP. Two, each hero has a unique passive ability that triggers once per turn, and providing you with a set amount of EXP if you meet that condition. Three, certain cards in game possess the ability Exemplar, which provides EXP equal to the amount of damage that they deal whenever they do.\n\nTake the hero Heldim as an example. He has a passive ability that provides 2 EXP whenever you attack with only one unit. When he reaches 4 total EXP, his level 1 reward is unlocked, which is a 2/2 flier named Cassiel that is played on the board for you for free, at the end of the turn you reach the reward threshold. His level 2, which requires 7 additional EXP to reach, resurrects Cassiel if she is dead and gives her +2/+2 permanently. His further rewards again resurrect Cassiel and provides her additional buffs.')
-        await bot.say('\n\nThe nature of heroes, their passives, and their rewards shapes the playstyle of the decks built under them, while allowing enough flexibility that multiple archetypes can be built under one hero. The aforementioned Heldim, for example, lends himself to aggro and aggressive midrange decks currently. Vriktik, on the other hand, has a passive that triggers on enemy unit death and gives rewards that are good at removing/stalling enemy units, so its decks tend to lean towards control. Building your deck to best take advantage of a given hero’s traits is a pillar of Collective’s gameplay, and enables a further layer of variety beyond the affinity system.')
-    elif link == 'restrictions':
-        await bot.say('Temporary rules based on current game restrictions\n\nTribal types right now are exact, so a “Feowyn Mutant” would not count as a Feowyn for example. We’re going to change this later, so as long as your tribal type doesn’t affect the game rules, feel free to put whatever you want for flavor.\n\nMechanics people have asked about but we haven’t implemented yet:\n\nRevealing hidden cards (looking at an opponent’s hand or the top of their deck). Because you can’t reveal cards in this way, you also can’t select a card from a set of revealed cards. So no “look at your opponent’s hand and discard one of those cards” effects\n\nSelecting cards from your own hand. No effects like “draw two cards, then choose and discard two cards from your hand.” You can do this right now but only if they are chosen randomly.\n\nCards with multiple targets. No cards like “One of your units deals its power in damage to another unit,” because you’d have to select your unit and the opponent’s unit\n\nTriggered abilities where you make decisions ("modes"). Also, no effects like “when an opponent draws a card, deal 1 damage to one of their units” because it requires you to choose what to deal damage to mid-turn. Again, this is fine if it’s chosen randomly\n\nManually triggering “hook” abilities like summon, entomb is not possible yet\n\nReplacement effects\n\nNo effects like “if you would draw a card, instead discard a card”\n\nNo effects like “if you would take damage, instead you…” (Including “instead nothing happens”)\n\nChange of control effects ("gain control of a unit" or "move a unit from your opponent\'s discard to your in play")\n\nTargets in any zone other than in play ("move a card from your discard to your hand" won\'t let you choose, you have to choose it randomly for now)')
-    elif link == 'affinities':
-        await bot.say('https://collective.gamepedia.com/Affinity_Identities')
+        await bot.say('\n\nThe nature of heroes, their passives, and the rewards shapes the playstyle of the decks built under them, while allowing enough flexibility that multiple archetypes can be built under one hero. The aforementioned Heldim, for example, lends himself to aggro and aggressive midrange decks currently. Vriktik, on the other hand, has a passive that triggers on enemy unit death and gives rewards that are good at removing/stalling enemy units, so its decks tend to lean towards control. Building your deck to best take advantage of a given hero’s traits is a pillar of Collective’s gameplay, and enables a further layer of variety beyond the affinity system.')
     elif link == 'basics':
         await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 13 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
+    elif link == 'player':
+        await bot.say('**Helpful Links**\nList of cards: <https://www.collective.gg/collection>\nList of keywords: <https://collective.gamepedia.com/Keywords>\nWrite-up of affinity identity trends: <https://collective.gamepedia.com/Affinity_Identities>\nList of current coding restraints: <https://collective.gamepedia.com/Temporary_rules>\nArticle on player design strategies: <https://medium.com/@nick#9853_13012/design-strategies-for-ccgs-that-our-players-taught-us-6f8585613f52>\n\n**Helpful Commands (add ! in front of the commands, use in #card-fetcher-spam )**\n!new basics (some foundational traits of the game)\n!new turns (explanation of the simultaneous turns system)\n!new heroes (explanation of the heroes and XP system)')
     else:
-        await bot.say("{} isnt a link I can give. the current links are: keys,collection,keywords,turns,links,heroes,restrictions,affinities,basics".format(link))
+        await bot.say("{} isnt a link I can give. the current links are: keys,collection,turns,heroes,basics,player".format(link))
 
 @bot.command(pass_context=True)
 async def say(ctx):
@@ -344,11 +326,15 @@ async def on_message(message):
             elif mod == 'mtg':
                 links.append(get_mtg(card))
             elif mod == 'sb':
-                links.append(get_stormbound(card))
+                links.append(get_from_set(card,stormbound_cards))
             elif mod == 'ygo':
                 links.append(get_ygo(card))
-            elif mod == 'eternal':
-                links.append(get_eternal(card))
+            elif mod == 'et':
+                links.append(get_from_set(card,eternal_cards))
+            elif mod == 'hs':
+                links.append(get_from_set(card,hs_cards))
+            elif mod == 'hs':
+                links.append('https://art.hearthstonejson.com/v1/render/latest/enUS/512x/'+get_from_set(card,hs_cards)+'.png')
             else:
                 links.append("the mode you chose is not present at this moment. current mods are: {}".format(','.join(POSSIBLE_MODS)))
     if links: # if there are any links
@@ -366,5 +352,6 @@ core_set = load_core_set()
 temp_cards = load_temp_cards()
 stormbound_cards = load_stormbound_cards()
 eternal_cards = load_eternal()
-POSSIBLE_MODS = ['mtg','sub','sb','ygo','eternal']
+hs_cards = load_hs()
+POSSIBLE_MODS = ['mtg','sub','sb','ygo','et','hs']
 bot.run(os.environ.get('BOT_TOKEN')) #DO NOT FORGET TO REMOVE
