@@ -281,6 +281,9 @@ async def squidward(ctx):
 async def excuseme(ctx):
     await bot.send_file(ctx.message.channel,'excuseme.jpg')
 
+@bot.command(pass_context=True)
+async def ticked(ctx):
+    await bot.send_file(ctx.message.channel,'trink.png')
 @bot.command()
 async def leaderboard():
     leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
