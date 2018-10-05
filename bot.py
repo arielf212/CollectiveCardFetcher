@@ -342,7 +342,7 @@ async def on_message(message):
 
 @bot.event
 async def on_reaction_add(reaction,user):
-    if reaction.emoji == '🤦' and reaction.message.author == bot.user:
+    if reaction.emoji == '👎' and reaction.message.author == bot.user:
         await bot.delete_message(reaction.message)
 
 #main
