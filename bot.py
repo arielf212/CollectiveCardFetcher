@@ -140,7 +140,7 @@ def get_core(card):
             list_partial = [max_partial]
         elif partial == max_partial[1]:
             list_partial.append((entry, partial))
-    if max_ratio < 20 and max_partial < 20:
+    if max_ratio[1] < 20 and max_partial[1] < 20:
         return '{} wasnt found, please try again'.format(card)
     if max_partial[1] > max_ratio[1]:
         return search_list[max_partial[0]]
