@@ -26,6 +26,8 @@ embed.add_field(name = '!image <link>' , value= 'Will return the art of the card
 embed.add_field(name = '!new', value = 'Needs to be used with one of the following topics after: keys, turns, keywords, collection, links, heroes, restrictions, affinities or basics. will return an explanation about said topic')
 embed.add_field(name = '!squidward' , value = 'The bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
 embed.add_field(name = '!excuseme' , value = 'Responds with the classic meme of "excuse me wtf".')
+embed.add_field(name = '!ticked' , value = 'Responds with a triggered nick image')
+embed.add_field(name = '!wack' , value = 'Responds with an image of mr crab saying "wack!"')
 embed.add_field(name = '!leaderboard', value = 'Responds with an embed holding the value of the current leaderboard.')
 bot.remove_command('help')
 
@@ -207,7 +209,7 @@ async def github():
 
 @bot.command(pass_context=True)
 async def nice(ctx):
-    await bot.send_file(ctx.message.channel, 'nice art.jpg')
+    await bot.send_file(ctx.message.channel, 'memes/nice art.jpg')
 
 @bot.command()
 async def good():
@@ -247,6 +249,8 @@ async def say(ctx):
     if ctx.message.author.id == '223876086994436097':
         await bot.delete_message(ctx.message)
         await bot.say(' '.join(ctx.message.content.split(' ')[1:]))
+    else:
+        await bot.say('YOU CANT CONTROL ME!!!!!!')
 
 @bot.command(pass_context=True)
 async def update(ctx):
@@ -278,15 +282,20 @@ async def image(ctx,link):
 
 @bot.command(pass_context=True)
 async def squidward(ctx):
-    await bot.send_file(ctx.message.channel,'squidward.jpg')
+    await bot.send_file(ctx.message.channel,'memes/squidward.jpg')
 
 @bot.command(pass_context=True)
 async def excuseme(ctx):
-    await bot.send_file(ctx.message.channel,'excuseme.jpg')
+    await bot.send_file(ctx.message.channel,'memes/excuseme.jpg')
 
 @bot.command(pass_context=True)
 async def ticked(ctx):
-    await bot.send_file(ctx.message.channel,'trink.png')
+    await bot.send_file(ctx.message.channel,'memes/trink.png')
+
+@bot.command(pass_context=True)
+async def wack(ctx):
+    await bot.send_file(ctx.message.channel,'memes/wack.jpg')
+
 @bot.command()
 async def leaderboard():
     leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
