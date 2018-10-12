@@ -358,4 +358,4 @@ stormbound_cards = load_stormbound_cards()
 eternal_cards = load_eternal()
 hs_cards = load_hs()
 POSSIBLE_MODS = ['mtg','sub','sb','ygo','et','hs']
-bot.run('NDczNTM5NjU3Mzg5NTcyMTAx.DqKdJw.wIKwCxjAjXDgYIRUuR_cbmTTkqY') #DO NOT FORGET TO REMOVE
+bot.run(os.environ.get('BOT_TOKEN')) #DO NOT FORGET TO REMOVE
