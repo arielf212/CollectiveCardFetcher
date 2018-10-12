@@ -6,6 +6,7 @@ from fuzzywuzzy import fuzz
 import asyncio
 import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
+import json # for ygo cards
 
 # Reddit variables
 reddit = praw.Reddit(client_id = 'x4FICJQqO4D14g' , client_secret = 'i9kip94Qs6R4Kfy77XYzDuv0z8Q' , user_agent = 'Card fetcher for Collective.') # gives access to reddit
@@ -41,7 +42,7 @@ def get_card_name(text):
             query = text[start + 2:end]
             if query.find(':') > 0:
                 mod = query[:query.find(':')].lower()
-                card = query[query.find(':')+1:]
+                card = query[query.find(':')+1:].lstrip(' ')
                 if mod not in POSSIBLE_MODS:
                     card = query
                     mod = 'none'
@@ -176,9 +177,9 @@ def get_from_set(card,set):
     return set[max_ratio[0]]
 
 def get_ygo(card):
-    id = requests.get('https://db.ygoprodeck.com/similarcards2.php?name=' + card).text[2:-2]
-    if id:
-        return 'https://ygoprodeck.com/pics/'+id.split(',')[0].split(':')[1][1:-1]+'.jpg'
+    query = requests.get('https://yugiohprices.com/search_card?search_text=' + card)
+    if query:
+        return 'https://static-3.studiobebop.net/ygo_data/card_images/{}.jpg'.format(query.url.split('name=')[-1].replace('+','_').replace('-','_').replace('%22','_'))
     else:
         return '{} was not found. please be more specific'.format(card)
 
@@ -357,4 +358,4 @@ stormbound_cards = load_stormbound_cards()
 eternal_cards = load_eternal()
 hs_cards = load_hs()
 POSSIBLE_MODS = ['mtg','sub','sb','ygo','et','hs']
-bot.run(os.environ.get('BOT_TOKEN')) #DO NOT FORGET TO REMOVE
+bot.run('NDczNTM5NjU3Mzg5NTcyMTAx.DqKdJw.wIKwCxjAjXDgYIRUuR_cbmTTkqY') #DO NOT FORGET TO REMOVE
