@@ -247,24 +247,6 @@ async def new(link):
         await bot.say("{} isnt a link I can give. the current links are: keys,collection,turns,heroes,basics,player".format(link))
 
 @bot.command(pass_context=True)
-async def say(ctx):
-    if ctx.message.author.id == '223876086994436097':
-        await bot.delete_message(ctx.message)
-        await bot.say(' '.join(ctx.message.content.split(' ')[1:]))
-    else:
-        await bot.say('YOU CANT CONTROL ME!!!!!!')
-
-@bot.command(pass_context=True)
-async def update(ctx):
-    global core_set
-    if os.environ.get("MOD_ROLE") in ctx.message.author.roles:
-        core_set = {}
-        for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
-            if card_info['imgurl'] is not None:
-                core_set[card_info['name']] = card_info['imgurl']
-        await bot.say('done updating the cards!')
-
-@bot.command(pass_context=True)
 async def image(ctx,link):
     if link.startswith('https://files.collective.gg/p/cards/'):
         card_id = '-'.join(link.split('/')[-1].split('-')[ :-1])
@@ -305,6 +287,30 @@ async def leaderboard():
         leaderboard.add_field(name='{}) {} {} {}'.format(spot['deck_rank'],spot['username'],spot['elo'],spot['hero_name']),value=(spot['deck_rank'])+1,inline=False)
     await bot.say(embed=leaderboard)
 
+# dev/admin commands
+def get_admin(ctx:discord.ext.commands.Context) -> discord.Role:
+    '''returns the card fetcher admin role of the server'''
+    user:discord.Member = ctx.message.author
+    return discord.utils.get(user.server.roles, name = os.environ.get("MOD_ROLE"))
+
+@bot.command(pass_context=True)
+async def say(ctx):
+    if ctx.message.author.id == '223876086994436097':
+        await bot.delete_message(ctx.message)
+        await bot.say(' '.join(ctx.message.content.split(' ')[1:]))
+    else:
+        await bot.say('YOU CANT CONTROL ME!!!!!!')
+
+@bot.command(pass_context=True)
+async def update(ctx):
+    global core_set
+    if get_admin(ctx) in ctx.message.author.roles:
+        core_set = {}
+        for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
+            if card_info['imgurl'] is not None:
+                core_set[card_info['name']] = card_info['imgurl']
+        await bot.say('done updating the cards!')
+
 @bot.command()
 async def help():
     await bot.say(embed=embed)
@@ -329,7 +335,7 @@ async def on_message(message):
                     if num.isdigit() and week.isdigit():
                         links += get_top(int(num), week)
                 elif card.split(' ')[2] == 'dc':
-                    links += list([x.url for x in filter(lambda post: not post.selftext ,collective.search('[DC{}'.format(week),sort='top',limit=int(num)))])
+                    links += list([x.url for x in filter(lambda post: not post.selftext, collective.search('[DC{}'.format(week),sort='top',limit=int(num)))])
         else:
             if mod == 'none':
                 links.append(get_core(card))
