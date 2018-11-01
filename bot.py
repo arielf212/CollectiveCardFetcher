@@ -192,6 +192,8 @@ def get_top(num , week):
         if (post.title.lower().startswith('[card') or post.title.lower().startswith('[update')):
             ret.append(post.url+' | '+str(post.score)+' | '+str(int(post.upvote_ratio*100))+'%')
             count+=1
+        if count == num:
+            break
     return ret
 
 # commands
