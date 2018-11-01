@@ -189,7 +189,7 @@ def get_top(num , week):
     ret = []
     count = 0
     for post in collective.search('flair:(week ' + week + ')',limit = 1000, sort = 'top'):
-        if (post.title.lower().startswith('[card') or post.title.lower().startswith('[update')) and count<num:
+        if (post.title.lower().startswith('[card') or post.title.lower().startswith('[update')):
             ret.append(post.url+' | '+str(post.score)+' | '+str(int(post.upvote_ratio*100))+'%')
             count+=1
     return ret
@@ -201,7 +201,7 @@ async def alive():
 
 @bot.command()
 async def server():
-     bot.say('https://discordapp.com/api/oauth2/authorize?client_id=465866501715525633&permissions=522304&scope=bot')
+    await bot.say('https://discordapp.com/api/oauth2/authorize?client_id=465866501715525633&permissions=522304&scope=bot')
 
 @bot.command()
 async def github():
@@ -255,7 +255,7 @@ async def say(ctx):
 @bot.command(pass_context=True)
 async def update(ctx):
     global core_set
-    if ctx.message.author.id == '223876086994436097':
+    if os.environ.get("MOD_ROLE") in ctx.message.author.roles:
         core_set = {}
         for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
             if card_info['imgurl'] is not None:
@@ -302,6 +302,7 @@ async def leaderboard():
     for spot in requests.get('https://server.collective.gg/api/public/leaderboards').json()['multi']:
         leaderboard.add_field(name='{}) {} {} {}'.format(spot['deck_rank'],spot['username'],spot['elo'],spot['hero_name']),value=(spot['deck_rank'])+1,inline=False)
     await bot.say(embed=leaderboard)
+
 @bot.command()
 async def help():
     await bot.say(embed=embed)
