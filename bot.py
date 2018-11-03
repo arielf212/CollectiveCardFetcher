@@ -280,6 +280,10 @@ async def ticked(ctx):
 async def wack(ctx):
     await bot.send_file(ctx.message.channel,'memes/wack.jpg')
 
+@bot.command(pass_context=True)
+async def blocked(ctx):
+    await bot.send_file(ctx.message.channel,'memes/fake_blocked.png')
+
 @bot.command()
 async def leaderboard():
     leaderboard = discord.Embed(title="leaderboard", color=0x00FFFF)
@@ -290,7 +294,7 @@ async def leaderboard():
 # dev/admin commands
 def get_admin(ctx:discord.ext.commands.Context) -> discord.Role:
     '''returns the card fetcher admin role of the server'''
-    user:discord.Member = ctx.message.author
+    user:discord.Member = ctx.message.author    
     return discord.utils.get(user.server.roles, name = os.environ.get("MOD_ROLE"))
 
 @bot.command(pass_context=True)
