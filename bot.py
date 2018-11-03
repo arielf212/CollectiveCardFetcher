@@ -282,7 +282,7 @@ async def wack(ctx):
 
 @bot.command(pass_context=True)
 async def blocked(ctx):
-    await bot.send_file(ctx.message.channel,'memes/fake_blocked.png')
+    await bot.send_file(ctx.message.channel,'memes/blocked.png')
 
 @bot.command()
 async def leaderboard():
