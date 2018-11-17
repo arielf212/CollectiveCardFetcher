@@ -3,6 +3,7 @@ from discord.ext import commands
 import discord
 import requests # this is for the mtg search
 from fuzzywuzzy import fuzz
+import psycopg2
 import asyncio
 import os # I need this to use environment variables on heroku
 import csv # this is to browse the core set
@@ -30,6 +31,10 @@ embed.add_field(name = '!ticked' , value = 'Responds with a triggered nick image
 embed.add_field(name = '!wack' , value = 'Responds with an image of mr crab saying "wack!"')
 embed.add_field(name = '!leaderboard', value = 'Responds with an embed holding the value of the current leaderboard.')
 bot.remove_command('help')
+
+# the database
+db = psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require')
+cursor = db.cursor()
 
 # functions
 def get_card_name(text):
@@ -230,19 +235,13 @@ async def score():
 
 @bot.command()
 async def new(link):
-    if link == 'keys':
-        await bot.say("Invite keys aren’t being given out currently, as the devs work on new player features. They will be available freely again in around 2 months’ time.\nIn the meantime, we have occasional Team Design Competitions. By participating (not winning) via teaming up with another player, you can get into the game. If you’d like, you can be put on a reminder list for if/when the next one happens.")
-    elif link == 'collection':
-        await bot.say("https://www.collective.gg/collection")
-    elif link == 'turns':
-        await bot.say("Each turn has two main phases. They are first the card/abilities phase, then the attack/block phase. At start of turn, each player first draws 1 card and gains 1 EXP.\n\nDuring the first phase, a player is assigned initiative, which alternates between players each turn. Players simultaneously play their cards and activate unit abilities (actives). Their decisions don't happen immediately, but go on a stack where they wait to be resolved, until both players finished making their choices. Then, starting with the player with initiative, all cards/abilities are resolved in the order they were selected in. After all of the effects of the cards/abilities of the initiative player resolves, then all of the non-initiative player's actions resolve. That ends the first phase.\n\nDuring the second phase, players again make simultaneous decisions that don't take effect until both have confirmed their choices. Attackers are selected first. After those choices are locked in, then defenders are selected. After defenders are locked in, combat happens. The initiative player's attackers deal their atk to their respective blockers' hp, or to the opponent's hp if unblocked. The attack value of a unit is dealt cumulatively to each defender, not the same amount to each. If an 1/2 attacker is blocked with two 1/1s, only one of the 1/1s will die. The order in which you select blocks is the order in which units block. This can lead to situations where a 1/2 is blocked with a vanilla 0/3 and a 1/1 deadly, and the deadly unit will kill the 1/2 without taking damage, because it was selected it to block second.")
-    elif link == 'heroes':
-        await bot.say('Collective is unique in utilizing Heroes and the EXP system as an integral part of gameplay. When you build a new deck, you do so under a hero of your choice, with that deck being bound to the hero and unable to be played with any other.  Heroes aren\'t actual units or cards, but act as a reward system through which you can receive a free unit on board, a spell in hand, or a passive ability that lasts for the duration of the game. Each hero (of which the game currently has four, with more planned) has 4 different rewards specific to them, provided sequentially when they "level up". Leveling up happens as certain EXP thresholds are reached within each match, which are reset once the match concludes, with the exact thresholds differing for each hero. EXP is attainable through three ways: One, at the beginning of each turn, each player gains 1 EXP. Two, each hero has a unique passive ability that triggers once per turn, and providing you with a set amount of EXP if you meet that condition. Three, certain cards in game possess the ability Exemplar, which provides EXP equal to the amount of damage that they deal whenever they do.\n\nTake the hero Heldim as an example. He has a passive ability that provides 2 EXP whenever you attack with only one unit. When he reaches 4 total EXP, his level 1 reward is unlocked, which is a 2/2 flier named Cassiel that is played on the board for you for free, at the end of the turn you reach the reward threshold. His level 2, which requires 7 additional EXP to reach, resurrects Cassiel if she is dead and gives her +2/+2 permanently. His further rewards again resurrect Cassiel and provides her additional buffs.')
-        await bot.say('\n\nThe nature of heroes, their passives, and the rewards shapes the playstyle of the decks built under them, while allowing enough flexibility that multiple archetypes can be built under one hero. The aforementioned Heldim, for example, lends himself to aggro and aggressive midrange decks currently. Vriktik, on the other hand, has a passive that triggers on enemy unit death and gives rewards that are good at removing/stalling enemy units, so its decks tend to lean towards control. Building your deck to best take advantage of a given hero’s traits is a pillar of Collective’s gameplay, and enables a further layer of variety beyond the affinity system.')
-    elif link == 'basics':
-        await bot.say('Life total: 25\nMana System: +1 max per turn, no max limit\nHandsize: 13 (overdraw burn)\nDecksize: 45 min, 300 max, 3 max per card\nMulligan: 4 card choose-to-replace\nFatigue: Instant death on empty draw\nTurn system: Simultaneous\nCard resolution: Resolving queue, alternating priority\nCard types: Units and actions only (creatures/sorceries)')
-    elif link == 'player':
-        await bot.say('**Helpful Links**\nList of cards: <https://www.collective.gg/collection>\nList of keywords: <https://collective.gamepedia.com/Keywords>\nWrite-up of affinity identity trends: <https://collective.gamepedia.com/Affinity_Identities>\nList of current coding restraints: <https://collective.gamepedia.com/Temporary_rules>\nArticle on player design strategies: <https://medium.com/@nick_13012/design-strategies-for-ccgs-that-our-players-taught-us-6f8585613f52>\n\n**Helpful Commands**\n!new basics (some foundational traits of the game)\n!new turns (explanation of the simultaneous turns system)\n!new heroes (explanation of the heroes and XP system)')
+    #might need in the near future:
+    #await bot.say('Collective is unique in utilizing Heroes and the EXP system as an integral part of gameplay. When you build a new deck, you do so under a hero of your choice, with that deck being bound to the hero and unable to be played with any other.  Heroes aren\'t actual units or cards, but act as a reward system through which you can receive a free unit on board, a spell in hand, or a passive ability that lasts for the duration of the game. Each hero (of which the game currently has four, with more planned) has 4 different rewards specific to them, provided sequentially when they "level up". Leveling up happens as certain EXP thresholds are reached within each match, which are reset once the match concludes, with the exact thresholds differing for each hero. EXP is attainable through three ways: One, at the beginning of each turn, each player gains 1 EXP. Two, each hero has a unique passive ability that triggers once per turn, and providing you with a set amount of EXP if you meet that condition. Three, certain cards in game possess the ability Exemplar, which provides EXP equal to the amount of damage that they deal whenever they do.\n\nTake the hero Heldim as an example. He has a passive ability that provides 2 EXP whenever you attack with only one unit. When he reaches 4 total EXP, his level 1 reward is unlocked, which is a 2/2 flier named Cassiel that is played on the board for you for free, at the end of the turn you reach the reward threshold. His level 2, which requires 7 additional EXP to reach, resurrects Cassiel if she is dead and gives her +2/+2 permanently. His further rewards again resurrect Cassiel and provides her additional buffs.')
+    #await bot.say('\n\nThe nature of heroes, their passives, and the rewards shapes the playstyle of the decks built under them, while allowing enough flexibility that multiple archetypes can be built under one hero. The aforementioned Heldim, for example, lends himself to aggro and aggressive midrange decks currently. Vriktik, on the other hand, has a passive that triggers on enemy unit death and gives rewards that are good at removing/stalling enemy units, so its decks tend to lean towards control. Building your deck to best take advantage of a given hero’s traits is a pillar of Collective’s gameplay, and enables a further layer of variety beyond the affinity system.')
+    cursor.execute("select content from new_command where name=%s",[link])
+    ans = cursor.fetchall()
+    if ans:
+        await bot.say(ans[0][0].replace(r"\n","\n"))
     else:
         await bot.say("{} isnt a link I can give. the current links are: keys,collection,turns,heroes,basics,player".format(link))
 
@@ -314,6 +313,27 @@ async def update(ctx):
             if card_info['imgurl'] is not None:
                 core_set[card_info['name']] = card_info['imgurl']
         await bot.say('done updating the cards!')
+
+@bot.command(pass_context=True)
+async def add(ctx, *args):
+    if get_admin(ctx) in ctx.message.author.roles:
+        cursor.execute("insert into new_command values(%s,%s,%s)", (args[0], True, args[1:]))
+        db.commit()
+        await bot.say("{} has been added!".format(args[0]))
+
+@bot.command(pass_context=True)
+async def edit(ctx, *args):
+    if get_admin(ctx) in ctx.message.author.roles:
+        cursor.execute("update new_command set is_file=%s, content=%s where name=%s", (True, args[1:], args[0]))
+        db.commit()
+        await bot.say("{} has been edited!".format(args[0]))
+
+@bot.command(pass_context=True)
+async def remove(ctx, *args):
+    if get_admin(ctx) in ctx.message.author.roles:
+        cursor.execute("delete from new_command where name=%s", [" ".join(args)])
+        db.commit()
+        await bot.say("{} has been removed!".format(args[0]))
 
 @bot.command()
 async def help():
