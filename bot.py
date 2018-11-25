@@ -241,6 +241,9 @@ async def image(ctx,link):
 
 @bot.command(pass_context=True)
 async def meme(ctx,link):
+    if link == 'list':
+        await bot.say(','.join(get_all_content("memes")))
+        return
     cursor.execute("select content from memes where name=%s", [link])
     fetch = cursor.fetchall()
     if fetch:
