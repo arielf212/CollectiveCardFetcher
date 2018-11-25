@@ -2,3 +2,4 @@ discord.py
 praw
 fuzzywuzzy
 python-Levenshtein
+psycopg2
