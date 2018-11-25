@@ -1,4 +1,5 @@
 import praw
+import io
 from discord.ext import commands
 import discord
 import requests # this is for the mtg search
@@ -24,14 +25,13 @@ embed.add_field(name = '!good' , value = 'Ups the score of the bot. Will make th
 embed.add_field(name = '!bad', value = 'Reduces the score of the bot. Will make the bot respond with an apologetic message.')
 embed.add_field(name = '!score' , value = 'The bot will respond with the amount of votes given to him trough !bad and !good')
 embed.add_field(name = '!image <link>' , value= 'Will return the art of the card linked.')
-embed.add_field(name = '!new', value = 'Needs to be used with one of the following topics after: keys, turns, keywords, collection, links, heroes, restrictions, affinities or basics. will return an explanation about said topic')
+embed.add_field(name = '!new', value = 'Takes a parameter and returns an explanation about it')
 embed.add_field(name = '!squidward' , value = 'The bot responds with a juicy nick meme about a squidward that summons 15 fortnite players.')
 embed.add_field(name = '!excuseme' , value = 'Responds with the classic meme of "excuse me wtf".')
 embed.add_field(name = '!ticked' , value = 'Responds with a triggered nick image')
 embed.add_field(name = '!wack' , value = 'Responds with an image of mr crab saying "wack!"')
 embed.add_field(name = '!leaderboard', value = 'Responds with an embed holding the value of the current leaderboard.')
 bot.remove_command('help')
-
 # the database
 db = psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require')
 cursor = db.cursor()
@@ -74,17 +74,6 @@ def load_core_set():
             core_set[card_info['name']] = card_info['imgurl']
     return core_set
 
-def load_temp_cards():
-    '''loads the temp saved cards from temp_cards.csv into a dictionary called temp_cards'''
-    temp_cards = {}
-    with open('temp_cards.csv' , 'r') as temp_cards_file:
-        temp_cards_csv = csv.reader(temp_cards_file , delimiter = ',')
-        for row in temp_cards_csv:
-            if row != []: # there is a bug that adds empty lines .this prevent the program from crashing from it
-                name , link = row # unpack the row into a name and a link
-                temp_cards[name] = link # adds the card into the core_set dictionary
-    return temp_cards
-
 def load_stormbound_cards():
     cards = {}
     with open('card_list' , 'r') as fcard_list:
@@ -126,15 +115,12 @@ async def repost_card(post_channel):
             await bot.send_message(post_channel , card)
         await asyncio.sleep(10)
 
-def get_core(card):
+def get_from_set(card,card_set):
     max_ratio = (' ', 0)  # maximum score in ratio exam
     max_partial = (' ', 0)  # maximum sort in partial ratio exam
     list_ratio = []
     list_partial = []
-    #lets put the core_set and temp_cards together
-    search_list = temp_cards.copy()
-    search_list.update(core_set)
-    for entry in search_list:
+    for entry in card_set:
         # lets check if an entry is "good enough" to be our card
         ratio = fuzz.ratio(card, entry)
         partial = fuzz.partial_ratio(card, entry)
@@ -151,8 +137,8 @@ def get_core(card):
     if max_ratio[1] < 20 and max_partial[1] < 20:
         return '{} wasnt found, please try again'.format(card)
     if max_partial[1] > max_ratio[1]:
-        return search_list[max_partial[0]]
-    return search_list[max_ratio[0]]
+        return card_set[max_partial[0]]
+    return card_set[max_ratio[0]]
 
 def get_mtg(card):
     '''sends a link to an image file of the mtg card'''
@@ -161,27 +147,6 @@ def get_mtg(card):
     if available['object'] == 'card':
         return 'https://api.scryfall.com/cards/named?fuzzy={};format=image;version=png'.format(card.replace(' ', '%20'))
     return "sorry, couldn't find {}. please try again.".format(card)
-
-def get_from_set(card,set):
-    max_ratio = (' ', 0)  # maximum score in ratio exam
-    max_partial = (' ', 0)  # maximum sort in partial ratio exam
-    for entry in set:
-        # lets check if an entry is "good enough" to be our card
-        ratio = fuzz.ratio(card, entry)
-        partial = fuzz.partial_ratio(card, entry)
-        if ratio > max_ratio[1]:
-            max_ratio = (entry, ratio)
-            list_ratio = [max_ratio]
-        elif ratio == max_ratio[1]:
-            list_ratio.append((entry, ratio))
-        if partial > max_partial[1]:
-            max_partial = (entry, partial)
-            list_partial = [max_partial]
-        elif partial == max_partial[1]:
-            list_partial.append((entry, partial))
-    if max_partial[1] > max_ratio[1]:
-        return set[max_partial[0]]
-    return set[max_ratio[0]]
 
 def get_ygo(card):
     query = requests.get('https://yugiohprices.com/search_card?search_text=' + card)
@@ -200,6 +165,16 @@ def get_top(num , week):
         if count == num:
             break
     return ret
+
+def get_all_content(table):
+    """
+    table - the name of the table
+    this function return a list of all of the available keys of the table specified
+    """
+    # this will return a list of tuples of names
+    cursor.execute("select name from {}".format(table))
+    # this takes the list of tuples and converts it to a list of keys and then sorts it alphabetically
+    return sorted(x[0] for x in cursor.fetchall())
 
 # commands
 @bot.command()
@@ -239,11 +214,11 @@ async def new(link):
     #await bot.say('Collective is unique in utilizing Heroes and the EXP system as an integral part of gameplay. When you build a new deck, you do so under a hero of your choice, with that deck being bound to the hero and unable to be played with any other.  Heroes aren\'t actual units or cards, but act as a reward system through which you can receive a free unit on board, a spell in hand, or a passive ability that lasts for the duration of the game. Each hero (of which the game currently has four, with more planned) has 4 different rewards specific to them, provided sequentially when they "level up". Leveling up happens as certain EXP thresholds are reached within each match, which are reset once the match concludes, with the exact thresholds differing for each hero. EXP is attainable through three ways: One, at the beginning of each turn, each player gains 1 EXP. Two, each hero has a unique passive ability that triggers once per turn, and providing you with a set amount of EXP if you meet that condition. Three, certain cards in game possess the ability Exemplar, which provides EXP equal to the amount of damage that they deal whenever they do.\n\nTake the hero Heldim as an example. He has a passive ability that provides 2 EXP whenever you attack with only one unit. When he reaches 4 total EXP, his level 1 reward is unlocked, which is a 2/2 flier named Cassiel that is played on the board for you for free, at the end of the turn you reach the reward threshold. His level 2, which requires 7 additional EXP to reach, resurrects Cassiel if she is dead and gives her +2/+2 permanently. His further rewards again resurrect Cassiel and provides her additional buffs.')
     #await bot.say('\n\nThe nature of heroes, their passives, and the rewards shapes the playstyle of the decks built under them, while allowing enough flexibility that multiple archetypes can be built under one hero. The aforementioned Heldim, for example, lends himself to aggro and aggressive midrange decks currently. Vriktik, on the other hand, has a passive that triggers on enemy unit death and gives rewards that are good at removing/stalling enemy units, so its decks tend to lean towards control. Building your deck to best take advantage of a given hero’s traits is a pillar of Collective’s gameplay, and enables a further layer of variety beyond the affinity system.')
     cursor.execute("select content from new_command where name=%s",[link])
-    ans = cursor.fetchall()
-    if ans:
-        await bot.say(ans[0][0].replace(r"\n","\n"))
+    fetch = cursor.fetchall()
+    if fetch:
+        await bot.say(fetch[0][0].replace(r"\n","\n"))
     else:
-        await bot.say("{} isnt a link I can give. the current links are: keys,collection,turns,heroes,basics,player".format(link))
+        await bot.say("{} isnt a link I can give. the current links are: {}".format(link, ','.join(get_all_content('new_command'))))
 
 @bot.command(pass_context=True)
 async def image(ctx,link):
@@ -253,7 +228,8 @@ async def image(ctx,link):
         if len(card_data) > 1:
             for prop in card_data['card']['Text']['Properties']:
                 if prop['Symbol']['Name'] == 'PortraitUrl':
-                    os.remove('card.png')
+                    if os.path.exists('card.png'):
+                        os.remove('card.png')
                     with open('card.png' , 'wb+') as img:
                         img_link =  requests.get(prop['Expression']['Value'])
                         img.write(img_link.content)
@@ -264,24 +240,13 @@ async def image(ctx,link):
         await bot.say('sorry, but this isnt a link!')
 
 @bot.command(pass_context=True)
-async def squidward(ctx):
-    await bot.send_file(ctx.message.channel,'memes/squidward.jpg')
-
-@bot.command(pass_context=True)
-async def excuseme(ctx):
-    await bot.send_file(ctx.message.channel,'memes/excuseme.jpg')
-
-@bot.command(pass_context=True)
-async def ticked(ctx):
-    await bot.send_file(ctx.message.channel,'memes/trink.png')
-
-@bot.command(pass_context=True)
-async def wack(ctx):
-    await bot.send_file(ctx.message.channel,'memes/wack.jpg')
-
-@bot.command(pass_context=True)
-async def blocked(ctx):
-    await bot.send_file(ctx.message.channel,'memes/blocked.png')
+async def meme(ctx,link):
+    cursor.execute("select content from memes where name=%s", [link])
+    fetch = cursor.fetchall()
+    if fetch:
+        await bot.send_file(ctx.message.channel, io.BytesIO(fetch[0][0]), filename="meme.png")
+    else:
+        await bot.say("couldn't find {}".format(link))
 
 @bot.command()
 async def leaderboard():
@@ -317,9 +282,17 @@ async def update(ctx):
 @bot.command(pass_context=True)
 async def add(ctx, *args):
     if get_admin(ctx) in ctx.message.author.roles:
-        cursor.execute("insert into new_command values(%s,%s,%s)", (args[0], True, args[1:]))
+        if args[0] == "meme":
+            if len(args) == 1:
+                await bot.say("you haven't specified a name for the meme!")
+            else:
+                meme = requests.get(ctx.message.attachments[0]['url']).content
+                cursor.execute("insert into memes values(%s,%s,%s)", (args[1], True, meme))
+                await bot.say("{} has been added!".format(args[1]))
+        else:
+            cursor.execute("insert into new_command values(%s,%s,%s)", (args[0], True, args[1:]))
+            await bot.say("{} has been added!".format(args[0]))
         db.commit()
-        await bot.say("{} has been added!".format(args[0]))
 
 @bot.command(pass_context=True)
 async def edit(ctx, *args):
@@ -331,9 +304,11 @@ async def edit(ctx, *args):
 @bot.command(pass_context=True)
 async def remove(ctx, *args):
     if get_admin(ctx) in ctx.message.author.roles:
-        cursor.execute("delete from new_command where name=%s", [" ".join(args)])
+        is_meme = args[0] == "meme"
+        table = "memes" if is_meme else "new_command"
+        cursor.execute("delete from {} where name=%s".format(table), [" ".join(args[is_meme:])])
         db.commit()
-        await bot.say("{} has been removed!".format(args[0]))
+        await bot.say("{} has been removed!".format(args[is_meme]))
 
 @bot.command()
 async def help():
@@ -362,7 +337,7 @@ async def on_message(message):
                     links += list([x.url for x in filter(lambda post: not post.selftext, collective.search('[DC{}'.format(week),sort='top',limit=int(num)))])
         else:
             if mod == 'none':
-                links.append(get_core(card))
+                links.append(get_from_set(card, core_set))
             elif mod == 'sub':
                 found = False
                 for post in collective.search(card, limit=1):  # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
@@ -395,7 +370,6 @@ async def on_reaction_add(reaction,user):
 
 #main
 core_set = load_core_set()
-temp_cards = load_temp_cards()
 stormbound_cards = load_stormbound_cards()
 eternal_cards = load_eternal()
 hs_cards = load_hs()
