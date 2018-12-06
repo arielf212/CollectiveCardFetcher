@@ -122,6 +122,7 @@ def get_from_set(card,card_set):
     list_partial = []
     for entry in card_set:
         # lets check if an entry is "good enough" to be our card
+        entry = entry.lower()
         ratio = fuzz.ratio(card, entry)
         partial = fuzz.partial_ratio(card, entry)
         if ratio > max_ratio[1]:
