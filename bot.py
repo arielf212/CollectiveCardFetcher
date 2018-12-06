@@ -71,7 +71,7 @@ def load_core_set():
     core_set = {}
     for card_info in requests.get('https://server.collective.gg/api/public-cards/').json()['cards']:
         if card_info['imgurl'] is not None:
-            core_set[card_info['name']] = card_info['imgurl']
+            core_set[card_info['name'].lower()] = card_info['imgurl']
     return core_set
 
 def load_stormbound_cards():
@@ -79,8 +79,8 @@ def load_stormbound_cards():
     with open('card_list' , 'r') as fcard_list:
         card_list = csv.reader(fcard_list , delimiter = '%')
         for row in card_list:
-            name , link = row
-            cards[name] = link
+            name, link = row
+            cards[name.lower()] = link
     return cards
 
 def load_eternal():
@@ -88,8 +88,8 @@ def load_eternal():
     with open('eternal_list.csv' , 'r') as fcard_list:
         card_list = csv.reader(fcard_list , delimiter = ',')
         for row in card_list:
-            name , link = row
-            cards[name] = link
+            name, link = row
+            cards[name.lower()] = link
     return cards
 
 def load_hs():
@@ -98,7 +98,7 @@ def load_hs():
     for card in card_data:
         if 'name' not in card:
             continue
-        cards[card['name']] = card['id']
+        cards[card['name'].lower()] = card['id']
     return cards
 
 def get_card():
@@ -122,7 +122,6 @@ def get_from_set(card,card_set):
     list_partial = []
     for entry in card_set:
         # lets check if an entry is "good enough" to be our card
-        entry = entry.lower()
         ratio = fuzz.ratio(card, entry)
         partial = fuzz.partial_ratio(card, entry)
         if ratio > max_ratio[1]:
