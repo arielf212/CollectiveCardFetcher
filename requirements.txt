@@ -1,4 +1,6 @@
+praw
 discord.py
 requests
 fuzzywuzzy
 python-Levenshtein
+psycopg2
