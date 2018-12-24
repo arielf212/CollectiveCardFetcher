@@ -320,6 +320,10 @@ async def help():
 # events
 @bot.event
 async def on_message(message):
+    # if it has the C word, then tell them its bad
+    if "code" in message.content:
+        await bot.send_message(message.channel, "please do not use the C word in this server! I advise you to use **blocks** instead.")
+
     cards = get_card_name(message.content) # this gets all card names in the message
     links = [] # here are the card links stored
     for card in cards:
