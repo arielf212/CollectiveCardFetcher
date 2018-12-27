@@ -258,6 +258,10 @@ async def leaderboard():
         leaderboard.add_field(name='{}) {} {} {}'.format(spot['deck_rank'],spot['username'],spot['elo'],spot['hero_name']),value=(spot['deck_rank'])+1,inline=False)
     await bot.say(embed=leaderboard)
 
+@bot.command()
+async def code():
+    await bot.say("C word alert! The word you are looking for is **blocks**.")
+
 # dev/admin commands
 def get_admin(ctx:discord.ext.commands.Context) -> discord.Role:
     '''returns the card fetcher admin role of the server'''
@@ -320,10 +324,6 @@ async def help():
 # events
 @bot.event
 async def on_message(message):
-    # if it has the C word, then tell them its bad
-    if "code" in message.content:
-        await bot.send_message(message.channel, "C word alert! The word you are looking for is **blocks**.")
-
     cards = get_card_name(message.content) # this gets all card names in the message
     links = [] # here are the card links stored
     for card in cards:
