@@ -128,13 +128,13 @@ def get_ygo(card):
     else:
         return '{} was not found. please be more specific'.format(card)
 
-def get_top(num, search):
+def get_top(num, search, extension):
     ret = []
     if num >= 1000:
         return "You requested too many posts at once. please try to ask for less posts next time!"
     # takes the top 1000 cards of this week and sorts them in order of upvotes
     posts = sorted(collective.search(search, limit=1000, sort='top'), key=lambda x: x.score, reverse=True)
-    for post in list(filter(lambda x: x.title.lower().startswith('[card'), posts))[:num]:
+    for post in list(filter(lambda x: x.title.lower().startswith(extension), posts))[:num]:
         ret.append(post.url+' | '+str(post.score)+' | '+str(int(post.upvote_ratio*100))+'%')
     return ret
 
@@ -303,21 +303,22 @@ async def on_message(message):
             if len(card.split(' ')) == 2:  # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 week = os.environ.get('WEEK')
-                links += get_top(int(num), 'flair:(' + week + ')')
+                links += get_top(int(num), 'flair:(' + week + ')', '[Card')
             elif len(card.split(' ')) == 4:  # the name looks like this: "top X week Y"
                 num = card.split(' ')[1]
                 week = card.split(' ')[3]
                 if num.isdigit() and week.isdigit():
                     if card.split(' ')[2] == 'week':
-                        links += get_top(int(num), 'flair:(' + week + ')')
+                        links += get_top(int(num), 'flair:(' + week + ')', '[Card')
                     elif card.split(' ')[2] == 'dc':
-                        links += get_top(int(num), '[DC' + week)
+                        links += get_top(int(num), '[DC' + week, '[DC')
         else:
             if mod == 'none':
                 links.append(get_from_set(card, core_set))
             elif mod == 'sub':
                 found = False
-                for post in collective.search(card, limit=1):  # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
+                # this searches the subreddit for the card name with the [card] tag and takes the top suggestion
+                for post in collective.search(card, limit=1):
                     if post.title.startswith('['):
                         links.append(post.url)
                         found = True
