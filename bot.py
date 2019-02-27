@@ -302,7 +302,7 @@ async def on_message(message):
             card = card.lower()
             if len(card.split(' ')) == 2:  # the name looks like this :"top X"
                 num = card.split(' ')[1]
-                week = int(os.environ.get('WEEK'))
+                week = os.environ.get('WEEK')
             elif len(card.split(' ')) == 4:  # the name looks like this: "top X week Y"
                 num = card.split(' ')[1]
                 week = card.split(' ')[3]
