@@ -32,8 +32,13 @@ embed.add_field(name="!meme", value="Takes a name and returns a meme saved under
 embed.add_field(name='!leaderboard', value='Responds with an embed holding the value of the current leaderboard.')
 bot.remove_command('help')
 # the database
-db = psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require')
-cursor = db.cursor()
+try:
+    db = psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require')
+    cursor = db.cursor()
+except psycopg2.OperationalError:
+    # if it reaches here, its pretty bad.
+    pass
+
 
 # functions
 def get_card_name(text):
@@ -303,15 +308,17 @@ async def on_message(message):
             if len(card.split(' ')) == 2:  # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 week = os.environ.get('WEEK')
-                links += get_top(int(num), 'flair:(' + week + ')', '[Card')
+                links += get_top(int(num), 'flair:(' + week + ')', '[card')
+            elif len(card.split(' ')) == 3:  # the name looks like this: "top X update"
+                pass
             elif len(card.split(' ')) == 4:  # the name looks like this: "top X week Y"
                 num = card.split(' ')[1]
                 week = card.split(' ')[3]
                 if num.isdigit() and week.isdigit():
                     if card.split(' ')[2] == 'week':
-                        links += get_top(int(num), 'flair:(' + week + ')', '[Card')
+                        links += get_top(int(num), 'flair:(' + week + ')', '[card')
                     elif card.split(' ')[2] == 'dc':
-                        links += get_top(int(num), '[DC' + week, '[DC')
+                        links += get_top(int(num), '[DC' + week, '[dc')
         else:
             if mod == 'none':
                 links.append(get_from_set(card, core_set))
