@@ -303,14 +303,15 @@ async def on_message(message):
             if len(card.split(' ')) == 2:  # the name looks like this :"top X"
                 num = card.split(' ')[1]
                 week = os.environ.get('WEEK')
+                links += get_top(int(num), 'flair:(' + week + ')')
             elif len(card.split(' ')) == 4:  # the name looks like this: "top X week Y"
                 num = card.split(' ')[1]
                 week = card.split(' ')[3]
-            if num.isdigit() and week.isdigit():
-                if card.split(' ')[2] == 'week':
-                    links += get_top(int(num), 'flair:(' + week + ')')
-                elif card.split(' ')[2] == 'dc':
-                    links += get_top(int(num), '[DC' + week)
+                if num.isdigit() and week.isdigit():
+                    if card.split(' ')[2] == 'week':
+                        links += get_top(int(num), 'flair:(' + week + ')')
+                    elif card.split(' ')[2] == 'dc':
+                        links += get_top(int(num), '[DC' + week)
         else:
             if mod == 'none':
                 links.append(get_from_set(card, core_set))
