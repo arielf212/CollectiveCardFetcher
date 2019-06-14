@@ -7,7 +7,8 @@ class HsFetcher(dict_fetcher.DictFetcher):
         card_set = {}
         card_set_url = "https://api.hearthstonejson.com/v1/31532/enUS/cards.collectible.json"
         for card in requests.get(card_set_url).json():
-            card_set[card['name']] = self.get_card_art_link(card['id'])
+            if not card['id'].startswith('HERO'):
+                card_set[card['name']] = self.get_card_art_link(card['id'])
         return super().__init__(card_set)
     
 
