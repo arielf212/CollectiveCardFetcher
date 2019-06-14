@@ -13,7 +13,7 @@ collective_sub = reddit.CollectiveSub()
 try:
     db = database.Database(os.environ.get("DATABASE_URL"))
 except:
-    print("off")
+    print("db off")
 new_command_table = database.TableWrapper(db, "new_command", "name", "content")
 memes_table = database.TableWrapper(db, "memes", "name", "content")
 admins_table = database.TableWrapper(db, "admins", "user_id", "privileges")
@@ -304,7 +304,6 @@ async def on_message(message):
     links = []  # here are the card links stored
     for card in cards:
         mod, card = card
-        print(mod, card)
         if card.lower().startswith('top '):  # if the search asks for the top X
             try:
                 links += get_top_sub(card)
