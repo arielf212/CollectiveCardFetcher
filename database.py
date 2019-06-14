@@ -19,24 +19,24 @@ class Database:
         self.add(table, key, value)
     
     def remove(self, table, pk_name, key):
-        cursor.execute("delete from {} where {}=%s".format(table, pk_name), [key])
+        self.cursor.execute("delete from {} where {}=%s".format(table, pk_name), [key])
         self.db.commit()
     
     def get(self, table, pk_name, value_name, key):
-        cursor.execute("select {} from {} where {}=%s".format(table, value_name, pk_name), [key])
-        fetch = cursor.fetchall()
+        self.cursor.execute("select {} from {} where {}=%s".format(table, value_name, pk_name), [key])
+        fetch = self.cursor.fetchall()
         if fetch:
             return fetch[0][0]
         else:
             raise KeyError
     
-    def get_all_keys(table, pk_name):
+    def get_all_keys(self, table, pk_name):
         """
         table - the name of the table
         this function return a list of all of the available keys of the table specified
         """
         # this will return a list of tuples of names
-        cursor.execute("select {} from {}".format(table, pk_name))
+        self.cursor.execute("select {} from {}".format(table, pk_name))
         # this takes the list of tuples and converts it to a list of keys and then sorts it alphabetically
         return sorted(x[0] for x in cursor.fetchall())
 
