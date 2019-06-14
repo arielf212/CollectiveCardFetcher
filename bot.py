@@ -1,5 +1,5 @@
 import reddit, database
-import fetcher.collective, fetcher.eternal, fetcher.mtg, fetcher.ygo
+import fetcher.collective, fetcher.eternal, fetcher.mtg, fetcher.ygo, fetcher.hs
 import discord, requests
 from PIL import Image
 from discord.ext import commands
@@ -33,7 +33,8 @@ card_fetchers = {
     "sub": collective_sub,
     "mtg": fetcher.mtg.MtgFetcher(),
     "et": fetcher.eternal.EternalFetcher(),
-    "ygo": fetcher.ygo.YugiohFetcher()
+    "ygo": fetcher.ygo.YugiohFetcher(),
+    'hs': fetcher.hs.HsFetcher()
 }
 
 # editing the "!help" command, to actually become... helpful :P 
