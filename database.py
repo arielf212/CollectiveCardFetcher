@@ -62,13 +62,13 @@ class TableWrapper:
         self.db.edit(self.table_name, self.pk_name, key, value)
     
     def remove(self, key):
-        self.db.remove(self, self.table_name, self.pk_name, key)
+        self.db.remove(self.table_name, self.pk_name, key)
     
     def get(self, key):
-        return self.db.get(self, self.table_name, self.pk_name, self.value_name, key)
+        return self.db.get(self.table_name, self.pk_name, self.value_name, key)
     
     def get_all_keys(self, key):
-        return self.db.get_all_keys(self, self.table_name, self.pk_name)
+        return self.db.get_all_keys(self.table_name, self.pk_name)
 
     def __contains__(self, key):
         try:
