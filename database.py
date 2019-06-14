@@ -23,7 +23,7 @@ class Database:
         self.db.commit()
     
     def get(self, table, pk_name, value_name, key):
-        self.cursor.execute("select {} from {} where {}=%s".format(table, value_name, pk_name), [key])
+        self.cursor.execute("select {} from {} where {}=%s".format(value_name, table, pk_name), [key])
         fetch = self.cursor.fetchall()
         if fetch:
             return fetch[0][0]
