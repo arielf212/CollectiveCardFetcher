@@ -27,13 +27,17 @@ class CollectiveSub:
     def get_top(self, num, type, week):
         """
         Returns the top <num> post of the subreddit that were posted on week <week> of type <type>.
-        for example: get_top(10, 44, "card") will return the top 10 posted cards of week 44.
+        for example: get_top(10, "card", 44) will return the top 10 posted cards of week 44.
         """
         ret = []
         if num >= 1000:
             return "You requested too many posts at once. please try to ask for less posts next time!"
         # takes the top 1000 cards of this week and sorts them in order of upvotes
-        posts = sorted(self.sub.search(week, limit=1000, sort='top'), key=lambda x: x.score, reverse=True)
+        posts = sorted(
+            self.sub.search('flair:' + week, limit=1000, sort='top'),
+             key=lambda x: x.score,
+             reverse=True
+        )
         for post in list(filter(lambda x: x.title.lower().startswith(type), posts))[:num]:
             ret.append(post.url + ' | ' + str(post.score) + ' | ' + str(int(post.upvote_ratio*100))+'%')
         return ret

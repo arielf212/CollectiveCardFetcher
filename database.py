@@ -7,7 +7,7 @@ class Database:
 
     def __init__(self, db_url):
         self.db = psycopg2.connect(db_url, sslmode='require')
-        self.cursor = db.cursor()
+        self.cursor = self.db.cursor()
         
 
     def add(self, table, key, value):

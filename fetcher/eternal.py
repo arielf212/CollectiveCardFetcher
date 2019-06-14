@@ -18,5 +18,5 @@ class EternalFetcher(dict_fetcher.DictFetcher):
         """
         cards = {}
         for card_info in warcry_json:
-            cards[card_info['Name']] = dict[card_info['ImageUrl']]
+            cards[card_info['Name']] = card_info['ImageUrl']
         return cards

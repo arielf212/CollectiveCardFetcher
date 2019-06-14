@@ -1,0 +1,7 @@
+praw
+discord.py==0.16
+requests
+fuzzywuzzy
+python-Levenshtein
+psycopg2
+pillow
