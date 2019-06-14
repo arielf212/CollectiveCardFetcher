@@ -11,7 +11,7 @@ class HsFetcher(dict_fetcher.DictFetcher):
         return super().__init__(card_set)
     
 
-    def get_card_art_link(card_id):
+    def get_card_art_link(self, card_id):
         """
         fetches a card image from hearthstonejson.com based on the id of the card.
         """
