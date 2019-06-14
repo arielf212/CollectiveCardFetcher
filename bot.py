@@ -197,13 +197,14 @@ async def concat(ctx,*args):
             new_im = Image.new('RGB', (total_width, max_height))
 
             x_offset = 0
-            for im in images:
+            for im in images:   
                new_im.paste(im, (x_offset,0))
                x_offset += im.size[0]
-            new_im.save("trash/update.png", format="png")
+            new_im.save("trash/update.png", "png")
             await bot.send_file(ctx.message.channel, "trash/update.png", filename="update.png")
-        except:
+        except Exception as e:
             await bot.say('card not found!')
+            raise e
     else:
         await bot.say('sorry, but this isnt a link!')
 
