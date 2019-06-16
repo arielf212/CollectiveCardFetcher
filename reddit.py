@@ -20,7 +20,7 @@ class CollectiveSub:
         # and grabs the first result who's name starts with "["
         for post in self.sub.search(card_name, limit=1):
             if post.title.startswith('['):
-                return card_name
+                return post.url
         raise KeyError("Card Not found")
     
 
