@@ -85,7 +85,8 @@ def get_top_sub(request):
     """
 
     request = request.lower()
-    top_types = ['week', 'dc', 'update']
+    week_types = ['week', 'preseason']
+    top_types = week_types + ['dc', 'update']
     # the form is: "top <num> (<type> (<num>)?)?"
     request_group = re.match(
         "top ([0-9]+)(?: ({})(?: ([0-9]+))?)?".format('|'.join(top_types)),
@@ -93,10 +94,17 @@ def get_top_sub(request):
     )
     if request_group is not None: # if the request was valid
         num, search_type, week = request_group.groups()
-        if search_type is None or search_type == 'week':
-            search_type = 'card'
         if week is None:
             week = os.environ.get("WEEK")
+        if search_type is None:
+            search_type = week_types[-1]
+        if search_type in week_types:
+            week = f"{search_type} {week}"
+            if search_type != 'week':
+                week = f"week {week}"
+            week = f'"{week}"'
+        if search_type in week_types:
+            search_type = 'card'
         return collective_sub.get_top(int(num), '['+search_type, week)
     else: raise ValueError("Request wasn't valid")
 
