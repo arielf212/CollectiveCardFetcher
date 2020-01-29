@@ -99,9 +99,10 @@ def get_top_sub(request):
         if search_type is None:
             search_type = week_types[-1]
         if search_type in week_types:
-            week = f"{search_type} {week}"
-            if search_type != 'week':
+            if search_type == 'week':
                 week = f"week {week}"
+            else:
+                week = f"{search_type} week {week}"
             week = f'"{week}"'
         if search_type in week_types:
             search_type = 'card'
