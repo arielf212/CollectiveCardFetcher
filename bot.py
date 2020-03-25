@@ -12,15 +12,14 @@ collective_sub = reddit.CollectiveSub()
 # database connections
 try:
     db = database.Database(os.environ.get("DATABASE_URL"))
+    new_command_table = database.TableWrapper(db, "new_command", "name", "content")
+    memes_table = database.TableWrapper(db, "memes", "name", "content")
+    admins_table = database.TableWrapper(db, "admins", "user_id", "privileges")
 except:
     print("db off")
-new_command_table = database.TableWrapper(db, "new_command", "name", "content")
-memes_table = database.TableWrapper(db, "memes", "name", "content")
-admins_table = database.TableWrapper(db, "admins", "user_id", "privileges")
-
+ 
 # This is the fetcher dict. when a search modifier is specified,
-# the bot looks here for t
-# he right fetcher to use.
+# the bot looks here for the right fetcher to use.
 # if you are extending this bot, add your fetcher through here.
 # a fetcher class must have a __getitem__ method that returns a string
 # on success and KeyError on failure.
