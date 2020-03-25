@@ -67,7 +67,7 @@ class TableWrapper:
     def get(self, key):
         return self.db.get(self.table_name, self.pk_name, self.value_name, key)
     
-    def get_all_keys(self, key):
+    def get_all_keys(self):
         return self.db.get_all_keys(self.table_name, self.pk_name)
 
     def __contains__(self, key):
