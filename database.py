@@ -36,7 +36,7 @@ class Database:
         this function return a list of all of the available keys of the table specified
         """
         # this will return a list of tuples of names
-        self.cursor.execute("select {} from {}".format(table, pk_name))
+        self.cursor.execute("select {} from {}".format(pk_name, table))
         # this takes the list of tuples and converts it to a list of keys and then sorts it alphabetically
         return sorted(x[0] for x in cursor.fetchall())
 
