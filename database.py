@@ -38,7 +38,7 @@ class Database:
         # this will return a list of tuples of names
         self.cursor.execute("select {} from {}".format(pk_name, table))
         # this takes the list of tuples and converts it to a list of keys and then sorts it alphabetically
-        return sorted(x[0] for x in cursor.fetchall())
+        return sorted(x[0] for x in self.cursor.fetchall())
 
 
 # wrappers for specific tables
