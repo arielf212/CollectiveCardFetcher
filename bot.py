@@ -220,7 +220,7 @@ async def concat(ctx,*args):
 @bot.command(pass_context=True)
 async def meme(ctx, link):
     if link == 'list':
-        await bot.say(','.join(memes_table.get_all_keys()))
+        await bot.say(', '.join(memes_table.get_all_keys()))
         return
     if link in memes_table:
         await bot.send_file(ctx.message.channel, io.BytesIO(memes_table[link]), filename="meme.png")
